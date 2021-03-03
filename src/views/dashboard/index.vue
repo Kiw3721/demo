@@ -30,7 +30,15 @@
           auto-complete="off"
         />
       </el-form-item>
-
+      <el-form-item label="工号：" prop="tno">
+        <el-input
+          ref="tno"
+          v-model="StudentForm.tno"
+          placeholder="请输入工号"
+          type="text"
+          auto-complete="off"
+        />
+      </el-form-item>
       <!-- <el-cascader style="width:1.3rem;"
                        :options="options"
                        v-model="addKeyPersonForm.registered"
@@ -47,6 +55,23 @@
           :props="{ expandTrigger: 'hover' }"
           @change="handleChange"
         ></el-cascader>
+      </el-form-item>
+
+      <el-form-item label="学院：" prop="collage">
+        <el-select
+          v-model="StudentForm.collage"
+          placeholder="请选择所属学院"
+          clearable
+          :style="{ width: '100%' }"
+        >
+          <el-option
+            v-for="(item, index) in collageOptions"
+            :key="index"
+            :label="item.label"
+            :value="item.value"
+            :disabled="item.disabled"
+          ></el-option>
+        </el-select>
       </el-form-item>
 
       <el-form-item>
@@ -88,19 +113,29 @@ export default {
         sex: "",
         age: "",
         sno: "",
-        majorClass: []
+        tno: "",
+        majorClass: [],
+        collage: ""
       },
       rules: {
         name: [
           { required: true, message: "请输入姓名", trigger: "blur" },
           { min: 2, max: 5, message: "长度在 2 到 5 个字符", trigger: "blur" }
         ],
-        age: [{ validator: checkAge, trigger: "blur" }],
+        age: [{ required: true, validator: checkAge, trigger: "blur" }],
         sex: [{ required: true, message: "请选择性别", trigger: "change" }],
         majorClass: [
           { required: true, message: "请选择学院专业班级", trigger: "change" }
         ],
-        sno: [{ required: true, validator: checkSno, trigger: "blur" }]
+        sno: [{ required: true, validator: checkSno, trigger: "blur" }],
+        tno: [{ required: true, validator: checkSno, trigger: "blur" }],
+        collage: [
+          {
+            required: true,
+            message: "请选择所属学院",
+            trigger: "change"
+          }
+        ]
       },
       options: [
         {
@@ -218,6 +253,17 @@ export default {
               ]
             }
           ]
+        }
+      ],
+
+      collageOptions: [
+        {
+          label: "信息科学与技术学院",
+          value: 1
+        },
+        {
+          label: "管理学院",
+          value: 2
         }
       ]
     };

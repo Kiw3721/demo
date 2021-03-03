@@ -30,8 +30,7 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
-export const constantRoutes = [
-  {
+export const constantRoutes = [{
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
@@ -57,7 +56,10 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: '个人中心', icon: 'dashboard' }
+      meta: {
+        title: '个人中心',
+        icon: 'dashboard'
+      }
     }]
   },
 
@@ -66,37 +68,50 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/assessment/table',
     name: 'Assessment',
-    meta: { title: '综合测评', icon: 'el-icon-s-help' },
-    children: [
-      {
+    meta: {
+      title: '综合测评',
+      icon: 'el-icon-s-help'
+    },
+    children: [{
         path: 'table',
         name: 'Table',
         component: () => import('@/views/assessment/table'),
-        meta: { title: '综合测评表', icon: 'table' }
+        meta: {
+          title: '综合测评表',
+          icon: 'table'
+        }
       },
       {
         path: 'rewards',
         name: 'Rewards',
         component: () => import('@/views/assessment/rewards'),
-        meta: { title: '奖扣分来源表', icon: 'table' },
-        children: [
-          {
+        meta: {
+          title: '奖扣分来源表',
+          icon: 'table'
+        },
+        children: [{
             path: 'moral',
             component: () => import('@/views/assessment/moral'),
             name: 'moral',
-            meta: { title: '思想分' }
+            meta: {
+              title: '思想分'
+            }
           },
           {
             path: 'study',
             component: () => import('@/views/assessment/study'),
             name: 'study',
-            meta: { title: '学业分' }
+            meta: {
+              title: '学业分'
+            }
           },
           {
             path: 'sport',
             component: () => import('@/views/assessment/sport'),
             name: 'sport',
-            meta: { title: '文体分' }
+            meta: {
+              title: '文体分'
+            }
           }
         ]
       }
@@ -105,35 +120,68 @@ export const constantRoutes = [
   {
     path: '/apply',
     component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Apply',
-        component: () => import('@/views/apply/index'),
-        meta: { title: '贫困申请', icon: 'form' }
+    children: [{
+      path: 'apply',
+      name: 'Apply',
+      component: () => import('@/views/apply/index'),
+      meta: {
+        title: '贫困申请',
+        icon: 'form'
       }
-    ]
+    }]
   },
   {
     path: '/health',
     component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'health',
-        component: () => import('@/views/health/index'),
-        meta: { title: '健康登记', icon: 'form' }
+    children: [{
+      path: 'health',
+      name: 'health',
+      component: () => import('@/views/health/index'),
+      meta: {
+        title: '健康登记',
+        icon: 'form'
       }
-    ]
+    }]
   },
-
+  {
+    path: '/table',
+    component: Layout,
+    children: [{
+      path: 'table',
+      name: 'table',
+      component: () => import('@/views/table/index'),
+      meta: {
+        title: '表单',
+        icon: 'form'
+      }
+    }]
+  },
+  // {
+  //   path: '/complex-table',
+  //   component: Layout,
+  //   children: [{
+  //     path: 'complex-table',
+  //     name: 'complex-table',
+  //     component: () => import('@/views/table/complex-table'),
+  //     meta: {
+  //       title: '可操作的表单',
+  //       icon: 'form'
+  //     }
+  //   }]
+  // },
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  {
+    path: '*',
+    redirect: '/404',
+    hidden: true
+  }
 ]
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({
+    y: 0
+  }),
   routes: constantRoutes
 })
 
