@@ -156,19 +156,19 @@ export const constantRoutes = [{
       }
     }]
   },
-  // {
-  //   path: '/complex-table',
-  //   component: Layout,
-  //   children: [{
-  //     path: 'complex-table',
-  //     name: 'complex-table',
-  //     component: () => import('@/views/table/complex-table'),
-  //     meta: {
-  //       title: '可操作的表单',
-  //       icon: 'form'
-  //     }
-  //   }]
-  // },
+  {
+    path: '/complex-table',
+    component: Layout,
+    children: [{
+      path: 'complex-table',
+      name: 'complex-table',
+      component: () => import('@/views/table/complex-table'),
+      meta: {
+        title: '可操作的表单',
+        icon: 'form'
+      }
+    }]
+  },
   // 404 page must be placed at the end !!!
   {
     path: '*',
