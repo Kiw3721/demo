@@ -144,27 +144,40 @@ export const constantRoutes = [{
     }]
   },
   {
-    path: '/table',
+    path: '/rewards-table',
     component: Layout,
     children: [{
-      path: 'table',
-      name: 'table',
-      component: () => import('@/views/table/index'),
+      path: 'rewards-table',
+      name: 'rewards-table',
+      component: () => import('@/views/teacher/rewards-table'),
       meta: {
-        title: '表单',
+        title: '奖扣分表格详情',
         icon: 'form'
       }
     }]
   },
   {
-    path: '/complex-table',
+    path: '/assessment-table',
     component: Layout,
     children: [{
-      path: 'complex-table',
-      name: 'complex-table',
-      component: () => import('@/views/table/complex-table'),
+      path: 'assessment-table',
+      name: 'assessment-table',
+      component: () => import('@/views/teacher/assessment-table'),
       meta: {
-        title: '可操作的表单',
+        title: '综合测评审核',
+        icon: 'form'
+      }
+    }]
+  },
+  {
+    path: '/apply-table',
+    component: Layout,
+    children: [{
+      path: 'apply-table',
+      name: 'apply-table',
+      component: () => import('@/views/teacher/apply-table'),
+      meta: {
+        title: '贫困申请审核',
         icon: 'form'
       }
     }]
