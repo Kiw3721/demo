@@ -25,12 +25,15 @@ import Layout from '@/layout'
   }
  */
 
+
 /**
  * constantRoutes
  * a base page that does not have permission requirements
  * all roles can be accessed
+ * 所有权限通用路由表，如首页和登录页和一些不用权限的公用页面
  */
-export const constantRoutes = [{
+export const constantRoutes = [
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
@@ -57,20 +60,35 @@ export const constantRoutes = [{
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
       meta: {
-        title: '个人中心',
+        title: '学生信息',
         icon: 'dashboard'
       }
     }]
   },
 
   {
+    path: '/health',
+    component: Layout,
+    children: [{
+      path: 'health',
+      name: 'health',
+      component: () => import('@/views/health/index'),
+      meta: {
+        title: '健康登记',
+        icon: 'form'
+      }
+    }]
+  },
+  {
     path: '/assessment',
     component: Layout,
     redirect: '/assessment/table',
+    alwaysShow: true,
     name: 'Assessment',
     meta: {
       title: '综合测评',
-      icon: 'el-icon-s-help'
+      icon: 'el-icon-s-help',
+      roles: ['admin','editor']
     },
     children: [{
         path: 'table',
@@ -78,7 +96,8 @@ export const constantRoutes = [{
         component: () => import('@/views/assessment/table'),
         meta: {
           title: '综合测评表',
-          icon: 'table'
+          icon: 'table',
+          roles: ['admin']
         }
       },
       {
@@ -87,14 +106,16 @@ export const constantRoutes = [{
         component: () => import('@/views/assessment/rewards'),
         meta: {
           title: '奖扣分来源表',
-          icon: 'table'
+          icon: 'table',
+          roles: ['admin']
         },
         children: [{
             path: 'moral',
             component: () => import('@/views/assessment/moral'),
             name: 'moral',
             meta: {
-              title: '思想分'
+              title: '思想分',
+              roles: ['admin']
             }
           },
           {
@@ -102,7 +123,8 @@ export const constantRoutes = [{
             component: () => import('@/views/assessment/study'),
             name: 'study',
             meta: {
-              title: '学业分'
+              title: '学业分',
+              roles: ['admin']
             }
           },
           {
@@ -110,7 +132,8 @@ export const constantRoutes = [{
             component: () => import('@/views/assessment/sport'),
             name: 'sport',
             meta: {
-              title: '文体分'
+              title: '文体分',
+              roles: ['admin']
             }
           }
         ]
@@ -126,33 +149,8 @@ export const constantRoutes = [{
       component: () => import('@/views/apply/index'),
       meta: {
         title: '贫困申请',
-        icon: 'form'
-      }
-    }]
-  },
-  {
-    path: '/health',
-    component: Layout,
-    children: [{
-      path: 'health',
-      name: 'health',
-      component: () => import('@/views/health/index'),
-      meta: {
-        title: '健康登记',
-        icon: 'form'
-      }
-    }]
-  },
-  {
-    path: '/rewards-table',
-    component: Layout,
-    children: [{
-      path: 'rewards-table',
-      name: 'rewards-table',
-      component: () => import('@/views/teacher/rewards-table'),
-      meta: {
-        title: '奖扣分表格详情',
-        icon: 'form'
+        icon: 'form',
+        roles: ['admin']
       }
     }]
   },
@@ -165,7 +163,22 @@ export const constantRoutes = [{
       component: () => import('@/views/teacher/assessment-table'),
       meta: {
         title: '综合测评审核',
-        icon: 'form'
+        icon: 'form',
+        roles: ['editor']
+      }
+    }]
+  },
+  {
+    path: '/rewards-table',
+    component: Layout,
+    children: [{
+      path: 'rewards-table',
+      name: 'rewards-table',
+      component: () => import('@/views/teacher/rewards-table'),
+      meta: {
+        title: '奖扣分表格详情',
+        icon: 'form',
+        roles: ['editor']
       }
     }]
   },
@@ -178,18 +191,30 @@ export const constantRoutes = [{
       component: () => import('@/views/teacher/apply-table'),
       meta: {
         title: '贫困申请审核',
-        icon: 'form'
+        icon: 'form',
+        roles: ['editor']
       }
     }]
   },
-  // 404 page must be placed at the end !!!
-  {
+   // 404 page must be placed at the end !!!
+   {
     path: '*',
     redirect: '/404',
     hidden: true
   }
 ]
 
+
+/**
+ * asyncRoutes
+ * the routes that need to be dynamically loaded based on user roles
+ * 异步挂载的路由，动态需要根据权限加载的路由表 
+ */
+export const asyncRoutes = [
+  
+]
+
+//实例化vue的时候只挂载constantRouter
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({

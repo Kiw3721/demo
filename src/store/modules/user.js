@@ -1,17 +1,20 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { resetRouter } from '@/router'
+import  router, { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
-    name: ''
+    account: '',
+    roles: []
     // avatar: ''
   }
 }
 
+//共享的数据
 const state = getDefaultState()
 
+//同步方法
 const mutations = {
   RESET_STATE: (state) => {
     Object.assign(state, getDefaultState())
@@ -19,25 +22,27 @@ const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_NAME: (state, name) => {
-    state.name = name
+  SET_ACCOUNT: (state, account) => {
+    state.account = account
+  },
+  SET_ROLES: (state, roles) => {
+    state.roles = roles
   }
   // SET_AVATAR: (state, avatar) => {
   //   state.avatar = avatar
   // }
 }
 
+//异步方法
 const actions = {
   // user login
-  login({ commit }, userInfo) {
-    const { username, password } = userInfo
+  login({ commit }, Info) {
+    const { account, password } = Info
+    // console.log("信息"+Info)
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ account: account, password: password }).then(response => {
         const { data } = response
-        // if (response.data.errorCode !== 200) {
-        //   // 登陆失败，回传提示信息
-        //   reject(data.errorMsg)
-        // }
+        console.log("返回的数据："+data)
         // 设置 token，作为用户已登陆的前端标识，存在 cookie 中
         commit('SET_TOKEN', data.token)
         // setToken() 方法会把 token 保存到 cookie 里
@@ -54,19 +59,19 @@ const actions = {
     return new Promise((resolve, reject) => {
       // 请求获取权限
       getInfo(state.token).then(response => {
-        // if (response.status !== 200) { // 由于mockjs 不支持自定义状态码只能这样hack
-        //   reject('error')
-        // }
+       
         const { data } = response
         
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
 
-        // const { name, avatar } = data
+        // const { account, avatar } = data
 
-        const { name } = data
-        commit('SET_NAME', name)
+        const { account,roles } = data
+        commit('SET_ACCOUNT', account)
+        commit('SET_ROLES', roles)
+        console.log("roles:"+roles)
         // commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {
@@ -82,6 +87,7 @@ const actions = {
         removeToken() // must remove  token  first
         resetRouter()
         commit('RESET_STATE')
+        commit('SET_ROLES', [])
         resolve()
       }).catch(error => {
         reject(error)
@@ -100,7 +106,7 @@ const actions = {
 }
 
 export default {
-  namespaced: true,
+  namespaced:true,
   state,
   mutations,
   actions

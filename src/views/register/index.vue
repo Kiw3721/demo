@@ -1,114 +1,158 @@
 <template>
   <div class="login-container">
-    <el-form ref="ruleForm" :model="ruleForm" status-icon :rules="rules" label-width="100px" class="registerForm">
+    <el-form
+      ref="ruleForm"
+      :model="ruleForm"
+      status-icon
+      :rules="rules"
+      label-width="100px"
+      class="registerForm"
+    >
       <div class="title-container">
         <h3 class="title">注册页面</h3>
       </div>
       <el-form-item label="账号" prop="account">
-        <el-input ref="account" v-model="ruleForm.account" placeholder="请输入账号" type="text" auto-complete="off" />
+        <el-input
+          ref="account"
+          v-model="ruleForm.account"
+          placeholder="请输入账号"
+          type="text"
+          auto-complete="off"
+        />
       </el-form-item>
-      <el-form-item label="密码" prop="pass">
-        <el-input v-model="ruleForm.pass" type="password" placeholder="请输入密码" autocomplete="off" />
+      <el-form-item label="密码" prop="password">
+        <el-input
+          v-model="ruleForm.password"
+          type="password"
+          placeholder="请输入密码"
+          autocomplete="off"
+        />
       </el-form-item>
-      <el-form-item label="确认密码" prop="checkPass">
-        <el-input v-model="ruleForm.checkPass" type="password" placeholder="请再次输入密码" autocomplete="off" />
+      <el-form-item label="确认密码" prop="cpassword">
+        <el-input
+          v-model="ruleForm.cpassword"
+          type="password"
+          placeholder="请再次输入密码"
+          autocomplete="off"
+        />
       </el-form-item>
-      <el-form-item label="所属角色" class="radio" prop="roles">
+      <el-form-item label="所属角色" class="radio" prop="role">
         <el-radio-group v-model="ruleForm.roles">
-          <el-radio label="student">学生</el-radio>
-          <el-radio label="teacher">老师</el-radio>
+          <el-radio label="0">学生</el-radio>
+          <el-radio label="1">老师</el-radio>
         </el-radio-group>
       </el-form-item>
       <div class="tips">
-        <span style="color:#214457;font-size: 14px;font-weight: bold;">ps:账号即对应的学号或工号</span>
+        <span style="color: #214457; font-size: 14px; font-weight: bold"
+          >ps:账号即对应的学号或工号</span
+        >
       </div>
       <el-form-item>
-        <el-button type="primary" @click="submitForm('ruleForm')">注册</el-button>
-        <el-button @click="resetForm('ruleForm')">重置</el-button>
+        <el-button type="primary" @click="registerForm">注册</el-button>
+        <el-button @click="Login">已有账号，返回登录</el-button>
       </el-form-item>
     </el-form>
+
+    <el-dialog
+  :title="title"
+  :visible.sync="dialogVisible"
+  width="30%"
+  :modal-append-to-body='false'
+  >
+  <span>请前往登录页面，进行登录</span>
+  <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="Login">确 定</el-button>
+  </span>
+
+</el-dialog>
+
   </div>
 </template>
 
 <script>
+import { addUser } from "@/api/register_s";
+
 export default {
-  name: 'Register',
+  name: "Register",
   data() {
     var checkAccount = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('账号不能为空'))
+        return callback(new Error("账号不能为空"));
       }
-    }
+    };
     var validatePass = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入密码'))
-      } else {
-        if (this.ruleForm.checkPass !== '') {
-          this.$refs.ruleForm.validateField('checkPass')
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else if(value.length < 6){
+        callback(new Error('密码不能少于6位数'))
+      }else{
+        if (this.ruleForm.cpassword !== "") {
+          this.$refs.ruleForm.validateField("cpassword");
         }
-        callback()
-      }
-    }
+        callback();
+      }    
+    };
     var validatePass2 = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请再次输入密码'))
-      } else if (value !== this.ruleForm.pass) {
-        callback(new Error('两次输入密码不一致!'))
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.ruleForm.password) {
+        callback(new Error("两次输入密码不一致!"));
       } else {
-        callback()
+        callback();
       }
-    }
+    };
     return {
       ruleForm: {
-        checkPass: '',
-        pass: '',
-        account: '',
-        roles: ''
+        cpassword: "",
+        password: "",
+        account: "",
+        roles: "0",
       },
       rules: {
-        pass: [
-          { validator: validatePass, trigger: 'blur' }
-        ],
-        checkPass: [
-          { validator: validatePass2, trigger: 'blur' }
-        ],
-        account: [
-          { validator: checkAccount, trigger: 'blur' }
-        ],
+        password: [{ validator: validatePass, trigger: "blur" }],
+        cpassword: [{ validator: validatePass2, trigger: "blur" }],
+        account: [{ validator: checkAccount, trigger: "blur" }],
         roles: [
-          { required: true, message: '请选择活动资源', trigger: 'change' }
-        ]
-      }
-    }
+          { required: true, message: "请选择活动资源", trigger: "change" },
+        ],
+      },
+      title:'',
+      dialogVisible: false
+    };
   },
   methods: {
-    submitForm(formName) {
-      console.log('12345')
-      this.$refs[formName].validate((valid) => {
-        console.log('1111111111')
-        if (valid) {
-          alert('submit!')
-          this.$message({
-            message: '注册成功',
-            type: 'success'
-          })
-          this.$router.push('/login')
-        } else {
-          console.log('注册失败！')
-          return false
-        }
-      })
+    registerForm() {
+      let data = {
+        account: this.ruleForm.account,
+        password: this.ruleForm.password,
+        cpassword: this.ruleForm.cpassword,
+        roles: this.ruleForm.roles,
+      };
+      console.log("xuehao:"+this.ruleForm.account)
+      addUser(data).then((res) => {
+        var code = res.code
+        var msg = res.message
+        if( code == 20000) { 
+          // alert(msg);
+          this.dialogVisible = true
+          this.title = msg
+          }else {
+            alert(msg)
+          }
+      });
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields()
-    }
-  }
-}
+    Login() {
+      console.log("返回登陆");
+      this.$router.push({ path: "/login" });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-$dark_gray:#101b20;
-$light_gray:#214457;
+$dark_gray: #101b20;
+$light_gray: #214457;
 
 .login-container {
   min-height: 100%;
@@ -127,7 +171,7 @@ $light_gray:#214457;
     overflow: hidden;
   }
 
-  .tips{
+  .tips {
     margin: 20px 30px;
   }
 
@@ -142,13 +186,13 @@ $light_gray:#214457;
       font-weight: bold;
     }
   }
-.radio{
-  margin:0;
-}
-.el-form-item--label{
-  text-align: center;
-}
-.el-form-item__error {
+  .radio {
+    margin: 0;
+  }
+  .el-form-item--label {
+    text-align: center;
+  }
+  .el-form-item__error {
     opacity: 0.4;
     font-size: 12px;
     color: rgb(238, 63, 63);
