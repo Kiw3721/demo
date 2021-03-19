@@ -11,27 +11,38 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <span>{{ name }}</span>
+          <span>{{ account }}</span>
           <!-- <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar"> -->
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
+          <!-- <router-link to="/">
             <el-dropdown-item>
               个人中心
             </el-dropdown-item>
-          </router-link>
-          <!-- <router-link to="/">
-            <el-dropdown-item>
-              忘记密码
-            </el-dropdown-item>
           </router-link> -->
-          <el-dropdown-item divided @click.native="logout">
-            <span style="display:block;">Log Out</span>
+          <router-link to="/">
+            <el-dropdown-item> 忘记密码 </el-dropdown-item>
+          </router-link>
+          <el-dropdown-item @click.native="dialogVisible = true">
+            <span style="display: block">退出</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+
+    <el-dialog
+      :title="title"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :modal-append-to-body="false"
+    >
+      <span>是否确认退出该系统？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="sureLogout">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -41,26 +52,39 @@ import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
 
 export default {
+  data() {
+    return {
+      title: "退出系统",
+      dialogVisible: false,
+    };
+  },
   components: {
     Breadcrumb,
-    Hamburger
+    Hamburger,
   },
   computed: {
     ...mapGetters([
       "sidebar",
       // 'avatar'
-      "name"
-    ])
+      "account",
+    ]),
   },
   methods: {
     toggleSideBar() {
       this.$store.dispatch("app/toggleSideBar");
     },
-    async logout() {
-      await this.$store.dispatch("user/logout");
+    // async logout() {
+    //   await this.$store.dispatch("user/logout");
+    //   this.$router.push(`/login?redirect=${this.$route.fullPath}`);
+    // }
+    sureLogout() {
+      // window.localStorage.removeItem("user")
+      localStorage.removeItem("user");
+      localStorage.removeItem("account");
+      console.log("退出成功！");
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
-    }
-  }
+    },
+  },
 };
 </script>
 

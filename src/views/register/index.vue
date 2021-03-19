@@ -131,9 +131,9 @@ export default {
       };
       console.log("xuehao:"+this.ruleForm.account)
       addUser(data).then((res) => {
-        var code = res.code
-        var msg = res.message
-        if( code == 20000) { 
+        var code = res.statusCode
+        var msg = res.msg
+        if( code == 200) { 
           // alert(msg);
           this.dialogVisible = true
           this.title = msg

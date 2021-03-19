@@ -7,7 +7,7 @@ import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
-
+var flag=0
 const whiteList = ['/login', '/register'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
@@ -18,63 +18,53 @@ router.beforeEach(async(to, from, next) => {
   document.title = getPageTitle(to.meta.title)
 
   // determine whether the user has logged in
-  const hasToken = getToken()
+  const hasToken = localStorage.getItem('user')?true:false
+  console.log(hasToken,'hasToken')
+
 
   if (hasToken) {
     if (to.path === '/login') {
-      // if is logged in, redirect to the home page
       next({ path: '/' })
-      NProgress.done()
+
     } else {
-      // const hasGetUserInfo = store.getters.name
-      // determine whether the user has obtained his permission roles through getInfo
-      const hasRoles = store.getters.roles && store.getters.roles.length > 0
-      if (hasRoles) {
-        console.log("有用户信息");
+
+        // 判断当前用户是否已拉取完user_info信息
+        if (hasToken&&flag==0){
+          //从sessionStorage中取出数据
+          const hasRoles = JSON.parse(localStorage.getItem('user')).roles
+          console.log("roles："+store.getters.roles,hasRoles)
+          const account = JSON.parse(localStorage.getItem('user')).account
+          console.log("对比账号："+store.getters.account,account);
+          // 拉取user_info
+          store.dispatch('permission/generateRoutes', hasRoles).then(res => {
+            flag++
+            console.log(res,'sdfsd')
+            var aaa=router.options.routes
+
+            router.options.routes=aaa.concat(res)
+            router.addRoutes(res)
+            console.log(aaa,'aaa',res, store.getters.permission_routes, router.options.routes)
+            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
+            next()
+          }).catch(err => {
+            next()
+          })
+        } else {
         next()
-      } else {
-        console.log("无用户信息")
-        try {
-          // get user info
-          // await store.dispatch('user/getInfo')
-
-          // next()
-          // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-          const { roles } = await store.dispatch('user/getInfo')
-          console.log("roles"+roles);
-
-          // generate accessible routes map based on roles
-          const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
-
-          console.log("路由信息："+accessRoutes)
-          // dynamically add accessible routes
-          router.addRoutes(accessRoutes)
-
-          // hack method to ensure that addRoutes is complete
-          // set the replace: true, so the navigation will not leave a history record
-          next({ ...to, replace: true })
-        } catch (error) {
-          // remove token and go to login page to re-login
-          await store.dispatch('user/resetToken')
-          Message.error(error || 'Has Error')
-          next(`/login?redirect=${to.path}`)
-          NProgress.done()
-        }
       }
     }
   } else {
-    /* has no token*/
-
+    // 没有token
     if (whiteList.indexOf(to.path) !== -1) {
-      // in the free login whitelist, go directly
+      // 在免登录白名单，直接进入
       next()
     } else {
-      // other pages that do not have permission to access are redirected to the login page.
-      next(`/login?redirect=${to.path}`)
+      next(`/login?redirect=${to.fullPath}`) // 否则全部重定向到登录页
       NProgress.done()
     }
   }
 })
+
 
 router.afterEach(() => {
   // finish progress bar

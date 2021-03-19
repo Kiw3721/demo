@@ -4,26 +4,19 @@ export function login(data) {
   return request({
     url: '/login',
     method: 'post',
-    data
-  })
-}
-
-export function login(data) {
-  return request({
-    url: '/login',
-    method: 'post',
-    data
+    data:data,
   })
 }
 
 
-export function getInfo(token) {
-  return request({
-    url: '/info',
-    method: 'get',
-    params: { token }
-  })
-}
+
+// export function getInfo(params) {
+//   return request({
+//     url: '/info',
+//     method: 'get',
+//     params
+//   })
+// }
 
 export function logout() {
   return request({

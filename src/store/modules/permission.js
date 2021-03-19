@@ -6,8 +6,10 @@ import { asyncRoutes, constantRoutes } from '@/router'
  * @param route
  */
 function hasPermission(roles, route) {
+
   if (route.meta && route.meta.roles) {
-    return roles.some(role => route.meta.roles.includes(role))
+   // console.log( 'roles, route',roles,route.meta.roles ,roles,route.meta.roles.some(role => role.includes(roles)))
+    return route.meta.roles.some(role => role.includes(roles)) //数组形式
   } else {
     return true
   }
@@ -31,11 +33,12 @@ export function filterAsyncRoutes(routes, roles) {
     }
   })
 
-  return res
+  return  res
 }
 
 const state = {
   routes: [],
+  a: 11,
   addRoutes: []
 }
 
@@ -48,16 +51,22 @@ const mutations = {
 
 const actions = {
   generateRoutes({ commit }, roles) {
-    return new Promise(resolve => {
+    // console.log(roles,'admin')
+    // var a=[]
+    // a.push(roles)
+    return new Promise((resolve, reject) => {
       let accessedRoutes
-      if (roles.includes('admin')) {
-        accessedRoutes = asyncRoutes || []
-      } else {
+
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-      }
-      commit('SET_ROUTES', accessedRoutes)
+    //    console.log(accessedRoutes,'!admin', filterAsyncRoutes(asyncRoutes, roles))
+
+      state.addRoutes=accessedRoutes
+      state.routes=accessedRoutes
+     //  commit('SET_ROUTES', accessedRoutes)
+    //  console.log(accessedRoutes,'!admin', filterAsyncRoutes(asyncRoutes, roles),'AS',)
+
       resolve(accessedRoutes)
-      console.log("路由有？"+accessedRoutes);
+
     })
   }
 }

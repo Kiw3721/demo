@@ -14,13 +14,6 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     // do something before request is sent
-    // 判断是否存在token，如果存在的话，则每个http header都加上token
-    if (store.getters.token) {
-      // let each request carry token
-      // ['X-Token'] is a custom headers key
-      // please modify it according to the actual situation
-      config.headers['token'] = getToken()
-    }
     return config
   },
   error => {
@@ -32,21 +25,12 @@ service.interceptors.request.use(
 
 // respone拦截器
 service.interceptors.response.use(
-  /**
-   * If you want to get http information such as headers or status
-   * Please return  response => response
-  */
 
-  /**
-   * Determine the request status by custom code
-   * Here is just an example
-   * You can also judge the status by HTTP Status Code
-   */
   response => {
     const res = response.data
 
     // //默认除了2XX之外的都是错误的，就会走这里if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    if (res.statusCode !== 200) {
       Message({
         message: res.message || 'Error',
         type: 'error',
@@ -54,7 +38,7 @@ service.interceptors.response.use(
       })
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
+      if (res.statusCode === 50008 || res.statusCode === 50012 || res.statusCode === 50014) {
         // to re-login
         MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
           confirmButtonText: 'Re-Login',

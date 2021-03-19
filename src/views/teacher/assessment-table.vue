@@ -37,7 +37,7 @@
       />
 
       <el-button
-        v-waves
+       
         class="filter-item"
         type="primary"
         icon="el-icon-search"
@@ -46,7 +46,7 @@
       </el-button>
       <!-- @click="handleFilter" -->
 
-      <el-button
+      <!-- <el-button
         v-waves
         :loading="downloadLoading"
         class="filter-item"
@@ -54,19 +54,18 @@
         icon="el-icon-download"
       >
         下载
-      </el-button>
+      </el-button> -->
       <!-- @click="handleDownload" -->
     </div>
 
+<!-- v-loading="listLoading" -->
     <el-table
-      :key="tableKey"
-      v-loading="listLoading"
+      
       :data="list"
       border
       fit
       highlight-current-row
       style="width: 100%"
-      @sort-change="sortChange"
     >
       <el-table-column
         label="ID"

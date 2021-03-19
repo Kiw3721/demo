@@ -54,7 +54,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'Login',
   data() {
@@ -105,6 +104,19 @@ export default {
     },
     handleLogin() {
       this.loading = true
+      // console.log("返回的数据：1")
+      // login(this.loginForm).then((res) => {
+      //   // const { data } = response
+      //   this.loading = false
+      //   console.log("返回的数据：2",res)
+      //   // 设置 token，作为用户已登陆的前端标识，存在 cookie 中
+      //   // commit('SET_TOKEN', data.token)
+      //   // setToken() 方法会把 token 保存到 cookie 里
+      //   // setToken(data.token)
+      //
+      // }).catch(error => {
+      //
+      // })
       this.$store.dispatch('user/login', this.loginForm).then((res) => {
             let roles = res.roles;
             this.$router.push({ path: this.redirect || '/' })

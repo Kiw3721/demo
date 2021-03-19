@@ -66,9 +66,19 @@ export const constantRoutes = [
     }]
   },
 
+]
+
+
+/**
+ * asyncRoutes
+ * the routes that need to be dynamically loaded based on user roles
+ * 异步挂载的路由，动态需要根据权限加载的路由表
+ */
+export const asyncRoutes = [
   {
     path: '/health',
     component: Layout,
+    meta: {roles: ['0']},
     children: [{
       path: 'health',
       name: 'health',
@@ -88,18 +98,18 @@ export const constantRoutes = [
     meta: {
       title: '综合测评',
       icon: 'el-icon-s-help',
-      roles: ['admin','editor']
+      roles: ['0']
     },
     children: [{
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/assessment/table'),
-        meta: {
-          title: '综合测评表',
-          icon: 'table',
-          roles: ['admin']
-        }
-      },
+      path: 'table',
+      name: 'Table',
+      component: () => import('@/views/assessment/table'),
+      meta: {
+        title: '综合测评表',
+        icon: 'table',
+        roles: ['0']
+      }
+    },
       {
         path: 'rewards',
         name: 'Rewards',
@@ -107,24 +117,24 @@ export const constantRoutes = [
         meta: {
           title: '奖扣分来源表',
           icon: 'table',
-          roles: ['admin']
+          roles: ['0']
         },
         children: [{
-            path: 'moral',
-            component: () => import('@/views/assessment/moral'),
-            name: 'moral',
-            meta: {
-              title: '思想分',
-              roles: ['admin']
-            }
-          },
+          path: 'moral',
+          component: () => import('@/views/assessment/moral'),
+          name: 'moral',
+          meta: {
+            title: '思想分',
+            roles: ['0']
+          }
+        },
           {
             path: 'study',
             component: () => import('@/views/assessment/study'),
             name: 'study',
             meta: {
               title: '学业分',
-              roles: ['admin']
+              roles: ['0']
             }
           },
           {
@@ -133,7 +143,7 @@ export const constantRoutes = [
             name: 'sport',
             meta: {
               title: '文体分',
-              roles: ['admin']
+              roles: ['0']
             }
           }
         ]
@@ -143,6 +153,7 @@ export const constantRoutes = [
   {
     path: '/apply',
     component: Layout,
+    meta: {roles: ['0']},
     children: [{
       path: 'apply',
       name: 'Apply',
@@ -150,13 +161,29 @@ export const constantRoutes = [
       meta: {
         title: '贫困申请',
         icon: 'form',
-        roles: ['admin']
+        roles: ['0']
+      }
+    }]
+  },
+  {
+    path: '/student-table',
+    component: Layout,
+    meta: {roles: ['1']},
+    children: [{
+      path: 'student-table',
+      name: 'student-table',
+      component: () => import('@/views/teacher/student-manage'),
+      meta: {
+        title: '学生信息管理',
+        icon: 'form',
+        roles: ['1']
       }
     }]
   },
   {
     path: '/assessment-table',
     component: Layout,
+    meta: {roles: ['1']},
     children: [{
       path: 'assessment-table',
       name: 'assessment-table',
@@ -164,13 +191,14 @@ export const constantRoutes = [
       meta: {
         title: '综合测评审核',
         icon: 'form',
-        roles: ['editor']
+        roles: ['1']
       }
     }]
   },
   {
     path: '/rewards-table',
     component: Layout,
+    meta: {roles: ['1']},
     children: [{
       path: 'rewards-table',
       name: 'rewards-table',
@@ -178,13 +206,14 @@ export const constantRoutes = [
       meta: {
         title: '奖扣分表格详情',
         icon: 'form',
-        roles: ['editor']
+        roles: ['1']
       }
     }]
   },
   {
     path: '/apply-table',
     component: Layout,
+    meta: {roles: ['1']},
     children: [{
       path: 'apply-table',
       name: 'apply-table',
@@ -192,7 +221,7 @@ export const constantRoutes = [
       meta: {
         title: '贫困申请审核',
         icon: 'form',
-        roles: ['editor']
+        roles: ['1']
       }
     }]
   },
@@ -204,15 +233,6 @@ export const constantRoutes = [
   }
 ]
 
-
-/**
- * asyncRoutes
- * the routes that need to be dynamically loaded based on user roles
- * 异步挂载的路由，动态需要根据权限加载的路由表 
- */
-export const asyncRoutes = [
-  
-]
 
 //实例化vue的时候只挂载constantRouter
 const createRouter = () => new Router({
