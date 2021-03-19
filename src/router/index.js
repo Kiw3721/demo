@@ -44,13 +44,6 @@ export const constantRoutes = [
     component: () => import('@/views/register/index'),
     hidden: true
   },
-
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
-  },
-
   {
     path: '/',
     component: Layout,
@@ -61,9 +54,15 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: {
         title: '学生信息',
-        icon: 'dashboard'
+        icon: 'dashboard',
       }
     }]
+  },
+
+  {
+    path: '/404',
+    component: () => import('@/views/404'),
+    hidden: true
   },
 
 ]
@@ -75,20 +74,7 @@ export const constantRoutes = [
  * 异步挂载的路由，动态需要根据权限加载的路由表
  */
 export const asyncRoutes = [
-  {
-    path: '/health',
-    component: Layout,
-    meta: {roles: ['0']},
-    children: [{
-      path: 'health',
-      name: 'health',
-      component: () => import('@/views/health/index'),
-      meta: {
-        title: '健康登记',
-        icon: 'form'
-      }
-    }]
-  },
+ 
   {
     path: '/assessment',
     component: Layout,
@@ -166,6 +152,21 @@ export const asyncRoutes = [
     }]
   },
   {
+    path: '/health',
+    component: Layout,
+    meta: {roles: ['0']},
+    children: [{
+      path: 'health',
+      name: 'health',
+      component: () => import('@/views/health/index'),
+      meta: {
+        title: '健康登记',
+        icon: 'form',
+        roles: ['0']
+      }
+    }]
+  },
+  {
     path: '/student-table',
     component: Layout,
     meta: {roles: ['1']},
@@ -220,6 +221,21 @@ export const asyncRoutes = [
       component: () => import('@/views/teacher/apply-table'),
       meta: {
         title: '贫困申请审核',
+        icon: 'form',
+        roles: ['1']
+      }
+    }]
+  },
+  {
+    path: '/health-table',
+    component: Layout,
+    meta: {roles: ['1']},
+    children: [{
+      path: 'health-table',
+      name: 'health-table',
+      component: () => import('@/views/teacher/health-table'),
+      meta: {
+        title: '学生健康信息',
         icon: 'form',
         roles: ['1']
       }

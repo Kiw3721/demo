@@ -23,8 +23,8 @@
       </el-form-item>
       <el-form-item label="性别：" prop="gender">
         <el-select v-model="StudentForm.gender" placeholder="请选择">
-          <el-option label="男" value="1" />
-          <el-option label="女" value="2" />
+          <el-option label="男" value="男" />
+          <el-option label="女" value="女" />
         </el-select>
       </el-form-item>
       <el-form-item label="年龄：" prop="age">
@@ -90,7 +90,7 @@
 <script>
 import { mapGetters } from "vuex";
 import {getCardTypeNumber} from "../../utils/validate"
-import { addComprehensive,updateComprehensive } from "@/api/student";
+import { addStudent,updateStudent } from "@/api/student";
 
 // 手机号验证
 function isvalidPhone(str) {
@@ -317,7 +317,7 @@ export default {
         userId:userId
       };
       // console.log("44444444"+data.s_number)
-      addComprehensive(data).then((res) => {
+      addStudent(data).then((res) => {
         var code = res.statusCode
         var msg = res.msg
         if( code == 200) { 
@@ -340,6 +340,7 @@ export default {
     updateForm(){
       const sId = JSON.parse(localStorage.getItem('userInfo')).s_id
       const userId = JSON.parse(localStorage.getItem('userInfo')).userId
+      console.log("表单的数据！！！"+JSON.stringify(this.StudentForm));
       let data = {
         s_id:sId,
         s_name: this.StudentForm.name,
@@ -352,7 +353,7 @@ export default {
         s_address: this.StudentForm.address,
         userId:userId
       };
-      updateComprehensive(data).then((res)=>{
+      updateStudent(data).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
         if( code == 200) {

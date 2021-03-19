@@ -85,9 +85,9 @@
             </el-form-item>
           </el-col>
           <el-col :span="11">
-            <el-form-item label="扣分-" prop="xixiangfenkf">
+            <el-form-item label="扣分-" prop="sixiangfenkf">
               <el-input
-                v-model="formData.xixiangfenkf"
+                v-model="formData.sixiangfenkf"
                 placeholder="请输入分数"
                 show-word-limit
                 clearable
@@ -103,6 +103,7 @@
                 show-word-limit
                 clearable
                 :style="{ width: '100%' }"
+                @click="getsixiangfenxj"
               ></el-input>
             </el-form-item>
           </el-col>
@@ -122,7 +123,7 @@
             </el-form-item>
           </el-col>
         </div>
-        <div class="study" style="margin:15px 0 0 0">
+        <div class="study" style="margin: 15px 0 0 0">
           <span>学业分(70分)-自评</span>
           <el-col :span="16">
             <el-form-item label="学习成绩(90分)" prop="xxcj">
@@ -251,7 +252,7 @@
           </el-col>
         </div>
         <el-col :span="24">
-          <el-form-item size="large" style="text-align: center;">
+          <el-form-item size="large" style="text-align: center">
             <el-button type="primary" @click="submitForm">提交</el-button>
             <el-button @click="resetForm">重置</el-button>
           </el-form-item>
@@ -263,199 +264,201 @@
 
 <script>
 export default {
-  components: {},
   props: [],
   data() {
     return {
       formData: {
-        sxzzgn: undefined,
-        jlgn: undefined,
-        jcwmxy: undefined,
-        jtgn: undefined,
-        xsgybx: undefined,
-        shsj: undefined,
-        sixiangfenjf: undefined,
-        xixiangfenkf: undefined,
-        sixiangfenxj: undefined,
-        sixiangfen: undefined,
-        xxcj: undefined,
-        xueyefenjf: undefined,
-        xueyefenkf: undefined,
-        xyfxiaoji: undefined,
-        xueyefen: undefined,
-        tiyuke: undefined,
-        wthd: undefined,
-        wentifenjf: undefined,
-        wentifenkf: undefined,
-        wentifenxj: undefined,
-        wentifen: undefined
+        sxzzgn: '',
+        jlgn: '',
+        jcwmxy: '',
+        jtgn: '',
+        xsgybx: '',
+        shsj: '',
+        sixiangfenjf: '',
+        sixiangfenkf: '',
+        sixiangfenxj: '',
+        sixiangfen: '',
+        xxcj: '',
+        xueyefenjf: '',
+        xueyefenkf: '',
+        xyfxiaoji: '',
+        xueyefen: '',
+        tiyuke: '',
+        wthd: '',
+        wentifenjf: '',
+        wentifenkf: '',
+        wentifenxj: '',
+        wentifen: '',
       },
       rules: {
         sxzzgn: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         jlgn: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         jcwmxy: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         jtgn: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         xsgybx: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         shsj: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         sixiangfenjf: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
-        xixiangfenkf: [
+        sixiangfenkf: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         sixiangfenxj: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         sixiangfen: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         xxcj: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         xueyefenjf: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         xueyefenkf: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         xyfxiaoji: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         xueyefen: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         tiyuke: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         wthd: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         wentifenjf: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         wentifenkf: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         wentifenxj: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         wentifen: [
           {
             required: true,
             message: "请输入分数",
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
-  computed: {},
+  computed: {
+    
+  },
   watch: {},
   created() {},
   mounted() {},
   methods: {
     submitForm() {
-      this.$refs["elForm"].validate(valid => {
-        if (!valid) return;
-        // TODO 提交表单
-      });
+      const sId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      
     },
     resetForm() {
       this.$refs["elForm"].resetFields();
+    },
+    getsixiangfenxj(){
+      this.formData.sixiangfenxj = this.formData.sxzzgn+this.formData.jlgn+this.formData.jcwmxy+this.formData.jtgn+this.formData.xsgybx+this.formData.shsj+this.formData.sixiangfenjf-this.formData.sixiangfenkf
     }
-  }
+  },
 };
 </script>
 
