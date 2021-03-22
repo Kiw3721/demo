@@ -47,13 +47,27 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/demo',
     children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
+      path: 'demo',
+      name: 'demo',
+      component: () => import('@/views/login/demo'),
       meta: {
-        title: '学生信息',
+        title: '首页',
+        icon: 'dashboard',
+      }
+    }]
+  },
+  {
+    path: '/changePassword',
+    component: Layout,
+    redirect: '/changePassword',
+    children: [{
+      path: 'changePassword',
+      name: 'changePassword',
+      component: () => import('@/views/login/changePassword'),
+      meta: {
+        title: '修改密码',
         icon: 'dashboard',
       }
     }]
@@ -74,6 +88,22 @@ export const constantRoutes = [
  * 异步挂载的路由，动态需要根据权限加载的路由表
  */
 export const asyncRoutes = [
+  {
+    path: '/dashboard',
+    component: Layout,
+    redirect: '/dashboard',
+    meta: {roles: ['0']},
+    children: [{
+      path: 'dashboard',
+      name: 'Dashboard',
+      component: () => import('@/views/dashboard/index'),
+      meta: {
+        title: '学生信息',
+        icon: 'dashboard',
+        roles: ['0']
+      }
+    }]
+  },
  
   {
     path: '/assessment',
@@ -110,28 +140,10 @@ export const asyncRoutes = [
           component: () => import('@/views/assessment/moral'),
           name: 'moral',
           meta: {
-            title: '思想分',
+            title: '奖扣分来源表',
             roles: ['0']
           }
-        },
-          {
-            path: 'study',
-            component: () => import('@/views/assessment/study'),
-            name: 'study',
-            meta: {
-              title: '学业分',
-              roles: ['0']
-            }
-          },
-          {
-            path: 'sport',
-            component: () => import('@/views/assessment/sport'),
-            name: 'sport',
-            meta: {
-              title: '文体分',
-              roles: ['0']
-            }
-          }
+        }
         ]
       }
     ]
@@ -242,11 +254,11 @@ export const asyncRoutes = [
     }]
   },
    // 404 page must be placed at the end !!!
-   {
-    path: '*',
-    redirect: '/404',
-    hidden: true
-  }
+  //  {
+  //   path: '*',
+  //   redirect: '/404',
+  //   hidden: true
+  // }
 ]
 
 

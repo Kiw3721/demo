@@ -21,9 +21,12 @@
               个人中心
             </el-dropdown-item>
           </router-link> -->
-          <router-link to="/">
+          <!-- <router-link to="/changePassword">
             <el-dropdown-item> 忘记密码 </el-dropdown-item>
-          </router-link>
+          </router-link> -->
+          <el-dropdown-item @click.native="changePassword">
+            <span style="display: block">忘记密码</span>
+          </el-dropdown-item>
           <el-dropdown-item @click.native="dialogVisible = true">
             <span style="display: block">退出</span>
           </el-dropdown-item>
@@ -81,9 +84,14 @@ export default {
       // window.localStorage.removeItem("user")
       localStorage.removeItem("user");
       localStorage.removeItem("account");
+      localStorage.clear()
       console.log("退出成功！");
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`);
+      window.location.reload()
+   //   this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     },
+    changePassword(){
+       this.$router.push(`/changePassword/changePassword`);
+    }
   },
 };
 </script>

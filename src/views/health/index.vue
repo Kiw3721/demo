@@ -23,23 +23,23 @@
           auto-complete="off"
         />
       </el-form-item>
-      <el-form-item label="学号" prop="sno">
+      <el-form-item label="学号" prop="number">
         <el-input
-          v-model="healthForm.sno"
+          v-model="healthForm.number"
           type="text"
           placeholder="请输入学号"
           autocomplete="off"
         />
       </el-form-item>
-      <el-form-item label="性别" prop="sex">
-        <el-select v-model="healthForm.sex" placeholder="请选择">
-          <el-option label="男" value="1" />
-          <el-option label="女" value="2" />
+      <el-form-item label="性别" prop="gender">
+        <el-select v-model="healthForm.gender" placeholder="请选择">
+          <el-option label="男" value="男" />
+          <el-option label="女" value="女" />
         </el-select>
       </el-form-item>
-      <el-form-item label="联系电话" prop="phone">
+      <el-form-item label="联系电话" prop="telephone">
         <el-input
-          v-model="healthForm.phone"
+          v-model="healthForm.telephone"
           type="text"
           placeholder="请输入联系方式"
           autocomplete="off"
@@ -56,15 +56,15 @@
       </el-form-item>
       <el-form-item label="体温" prop="temperature">
         <el-select v-model="healthForm.temperature" placeholder="请选择">
-          <el-option label="36℃以下" value="1" />
-          <el-option label="36℃-37℃" value="2" />
-          <el-option label="37℃以上" value="3" />
+          <el-option label="36℃以下" value="36℃以下" />
+          <el-option label="36℃-37℃" value="36℃-37℃" />
+          <el-option label="37℃以上" value="37℃以上" />
         </el-select>
       </el-form-item>
       <el-form-item label="是否有咳嗽、呼吸困难等症状" prop="ill">
         <el-select v-model="healthForm.ill" placeholder="请选择">
-          <el-option label="是" value="1" />
-          <el-option label="否" value="2" />
+          <el-option label="是" value="是" />
+          <el-option label="否" value="否" />
         </el-select>
       </el-form-item>
       <el-form-item label="目前所在地" prop="region">
@@ -80,10 +80,20 @@
       <el-form-item style="padding:0 300px">
         <el-button
           type="primary"
-          @click="submitForm('healthForm')"
+          @click="submitForm"
           style="margin:0 20px"
+          v-show="show"
           >提交</el-button
         >
+        
+         
+        <el-button
+          type="primary"
+          @click="updateForm"
+          style="margin:0 20px"
+          >修改</el-button
+        >
+        
         <el-button @click="resetForm('healthForm')">重置</el-button>
       </el-form-item>
     </el-form>
@@ -91,17 +101,19 @@
 </template>
 
 <script>
-import { regionData, CodeToText } from "element-china-area-data";
+import { regionData, CodeToText,TextToCode } from "element-china-area-data";
+import { addHealth ,updateHealth,selectHealthById} from "@/api/health";
 
 export default {
   name: "Health",
+  inject:['reload'],
   data() {
-    var checkSno = (rule, value, callback) => {
+    var checknumber = (rule, value, callback) => {
       if (!value) {
         return callback(new Error("学号不能为空"));
       }
     };
-    var checkPhone = (rule, value, callback) => {
+    var checktelephone = (rule, value, callback) => {
       if (!value) {
         return callback(new Error("手机号不能为空"));
       } else {
@@ -117,26 +129,27 @@ export default {
     return {
       options: regionData,
       healthForm: {
-        name: "",
-        sno: "",
-        sex: "",
-        phone: "",
+        name: "" ,
+        number: "",
+        gender: "",
+        telephone: "",
         time: "",
         temperature: "",
         ill: "",
         region: []
       },
+      local:'',
       healthRules: {
         name: [
           { required: true, message: "请输入姓名", trigger: "blur" },
           { min: 2, max: 5, message: "长度在 2 到 5 个字符", trigger: "blur" }
         ],
-        sno: [{ required: true, validator: checkSno, trigger: "blur" }],
-        sex: [{ required: true, message: "请选择性别", trigger: "change" }],
-        phone: [
+        number: [{ required: true, validator: checknumber, trigger: "blur" }],
+        gender: [{ required: true, message: "请选择性别", trigger: "change" }],
+        telephone: [
           {
             required: true,
-            validator: checkPhone,
+            validator: checktelephone,
             type: "number",
             trigger: "blur"
           }
@@ -147,36 +160,135 @@ export default {
         ],
         ill: [{ required: true, trigger: "blur" }],
         region: [{ required: true, message: "请选择所在地", trigger: "blur" }]
-      }
+      },
+      show:true
     };
   },
+  created(){
+    const hasUserInfo = localStorage.getItem('userInfo')
+    console.log("aaaaaa"+ hasUserInfo);  //string
+    if(hasUserInfo === "undefined"){
+      console.log("未填写学生信息")
+    }else{
+      this.selectHealthById()
+    }
+
+
+  },
   methods: {
-    submitForm(formName) {
-      console.log("12345");
-      this.$refs[formName].validate(valid => {
-        console.log("1111111111");
-        if (valid) {
-          alert("submit!");
-          this.$message({
-            message: "提交成功",
+    submitForm() {
+      console.log("111111"+this.healthForm.region)
+      const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      console.log("12345"+studentId);
+      let data={
+        studentId:studentId,
+        name: this.healthForm.name,
+        number:this.healthForm.number,
+        gender: this.healthForm.gender,
+        telephone: this.healthForm.telephone,
+        time:this.healthForm.time,
+        temperature:this.healthForm.temperature,
+        ill: this.healthForm.ill,
+        region: this.local
+      }
+      addHealth(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        if( code == 200) { 
+         this.$message({
+            message: msg,
             type: "success"
           });
-        } else {
-          console.log("提交失败！");
-          return false;
-        }
-      });
+          this.show=false
+          }else {
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("录入失败！"+msg);
+            return false;
+          }
+      })
+      
+    },
+    updateForm(){
+      const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      let data={
+        studentId:studentId,
+        name: this.healthForm.name,
+        number:this.healthForm.number,
+        gender: this.healthForm.gender,
+        telephone: this.healthForm.telephone,
+        time:this.healthForm.time,
+        temperature:this.healthForm.temperature,
+        ill: this.healthForm.ill,
+        region: this.local
+      }
+      updateHealth(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        if( code == 200) {
+         this.$message({
+            message: msg,
+            type: "success"
+          });
+          this.reload()
+          }else {
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("修改失败！"+msg);
+          }
+      })
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
     handleChange() {
       var loc = "";
-      for (let i = 0; i < this.selectedOptions.length; i++) {
-        loc += CodeToText[this.selectedOptions[i]];
+      for (let i = 0; i < this.healthForm.region.length; i++) {
+        loc += CodeToText[this.healthForm.region[i]];
       }
-      alert(loc);
-    }
+      console.log(loc)
+      this.local = loc
+    },
+    selectHealthById(){
+       const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      console.log("12345",studentId)
+      let data = {studentId:studentId}
+      selectHealthById(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        var health = res.list
+        if(code == 200){
+          this.$message({
+            message: msg,
+            type: "success"
+          });
+          this.healthForm.name=health.name,
+          this.healthForm.number=health.number,
+          this.healthForm.gender=health.gender,
+          this.healthForm.telephone=health.telephone,
+          this.healthForm.time=health.time
+          this.healthForm.temperature=health.temperature
+          this.healthForm.ill=health.ill
+          this.healthForm.region=health.region
+          console.log("123456",health.region)
+          console.log(TextToCode["河北省"]["秦皇岛市"]["海港区"])
+        }else{
+           this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("获取失败！"+msg);
+            return false;
+        }
+      })
+    },
+    // changeRegion(){
+      
+    // }
   }
 };
 </script>

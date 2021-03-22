@@ -79,7 +79,7 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="submitForm">提交</el-button>
+        <el-button type="primary" @click="submitForm" v-show="show">提交</el-button>
         <el-button type="primary" @click="updateForm">修改</el-button>
         <el-button @click="resetForm('StudentForm')">重置</el-button>
       </el-form-item>
@@ -90,7 +90,7 @@
 <script>
 import { mapGetters } from "vuex";
 import {getCardTypeNumber} from "../../utils/validate"
-import { addStudent,updateStudent } from "@/api/student";
+import { addStudent,updateStudent,getStudentById} from "@/api/student";
 
 // 手机号验证
 function isvalidPhone(str) {
@@ -110,6 +110,7 @@ function isvalidPhone(str) {
 
 export default {
   name: "Dashboard",
+  inject:['reload'],
   data() {
     var checkNumber = (rule, value, callback) => {
       let regEn = /^[1-9]\d*$/
@@ -151,11 +152,11 @@ export default {
       },
       options: [
         {
-          value: "xxkxyjsxy",
+          value: "信息科学与技术学院",
           label: "信息科学与技术学院",
           children: [
             {
-              value: "jisuanji",
+              value: "计算机",
               label: "计算机",
               children: [
                 {
@@ -177,7 +178,7 @@ export default {
               ]
             },
             {
-              value: "dianzixinxi",
+              value: "电子信息",
               label: "电子信息",
               children: [
                 {
@@ -199,7 +200,7 @@ export default {
               ]
             },
             {
-              value: "xinxiguanliyuxinxixitong",
+              value: "信息管理与信息系统",
               label: "信息管理与信息系统",
               children: [
                 {
@@ -221,7 +222,7 @@ export default {
               ]
             },
             {
-              value: "wulianwang",
+              value: "物联网",
               label: "物联网",
               children: [
                 {
@@ -239,7 +240,7 @@ export default {
               ]
             },
             {
-              value: "dashuju",
+              value: "大数据",
               label: "大数据",
               children: [
                 {
@@ -267,38 +268,24 @@ export default {
           ]
         }
       ],
+      show:true
 
-      // collageOptions: [
-      //   {
-      //     label: "信息科学与技术学院",
-      //     value: 1
-      //   },
-      //   {
-      //     label: "管理学院",
-      //     value: 2
-      //   }
-      // ]
+     
     };
   },
   computed: {
     ...mapGetters(["account"])
   },
   created() {
+    
     // const hasUserInfo = localStorage.getItem('userInfo')?true:false
     const hasUserInfo = localStorage.getItem('userInfo')
-    console.log("aaaaaa"+ typeof hasUserInfo);  //string
-    if(hasUserInfo !== "undefined"){
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'))
-     this.StudentForm.name = userInfo.s_name,
-     this.StudentForm.number = userInfo.s_number,
-    this.StudentForm.gender = userInfo.s_gender,
-     this.StudentForm.age = userInfo.s_age,
-    this.StudentForm.majorClass =JSON.parse(userInfo.s_college),
-    this.StudentForm.phone = userInfo.s_telephone,
-    this.StudentForm.idCard = userInfo.s_idCard,
-    this.StudentForm.address = userInfo.s_address
-    }else{
+    console.log("aaaaaa"+ hasUserInfo);  //string
+    if(hasUserInfo === "undefined"){
       console.log("未填写个人信息")
+    }else{
+      this.show = false
+      this.getStudentById()
     }
   },
   methods: {
@@ -327,6 +314,7 @@ export default {
             message: msg,
             type: "success"
           });
+          this.show = false
           }else {
             this.$message({
             message: msg,
@@ -357,16 +345,54 @@ export default {
         var code = res.statusCode
         var msg = res.msg
         if( code == 200) {
+        // 将后台返回的学生信息存入浏览器localStorage
+        localStorage.setItem("userInfo", JSON.stringify(data));
          this.$message({
             message: msg,
             type: "success"
           });
+          this.reload()
           }else {
             this.$message({
             message: msg,
             type: "error"
           });
             console.log("修改失败！"+msg);
+          }
+      })
+    },
+    getStudentById(){
+      const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      console.log("12345",studentId)
+      let data = {studentId:studentId}
+      getStudentById(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        var list = res.data
+        if( code == 200) { 
+        // // 将后台返回的JSON数据存入浏览器localStorage
+        // localStorage.setItem("userInfo", JSON.stringify(res.data));
+         this.$message({
+            message: msg,
+            type: "success"
+          });
+          console.log("3333333",res.data)
+          // console.log("44444444444",res.data.s_id)
+            this.StudentForm.name = list.s_name,
+            this.StudentForm.number = list.s_number,
+            this.StudentForm.gender = list.s_gender,
+            this.StudentForm.age = list.s_age,
+            this.StudentForm.majorClass =JSON.parse(list.s_college),
+            this.StudentForm.phone = list.s_telephone,
+            this.StudentForm.idCard = list.s_idCard,
+            this.StudentForm.address = list.s_address
+          }else {
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("获取失败！"+msg);
+            return false;
           }
       })
     },

@@ -119,7 +119,7 @@ export default {
       // })
       this.$store.dispatch('user/login', this.loginForm).then((res) => {
             let roles = res.roles;
-            this.$router.push({ path: this.redirect || '/' })
+            this.$router.push({ path:'/' })
             this.loading = false
           }).catch((errorMsg) => {
             this.loading = false

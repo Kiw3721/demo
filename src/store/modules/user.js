@@ -63,10 +63,12 @@ const actions = {
         commit('SET_ACCOUNT', account)
 
         state.roles.push(response.data.roles)
-        // 将后台返回的JSON数据存入浏览器localStorage
+        // 将后台返回的用户信息存入浏览器localStorage
         localStorage.setItem("user", JSON.stringify(response.data));
-        // 将后台返回的JSON数据存入浏览器localStorage
+        // 将后台返回的学生信息存入浏览器localStorage
         localStorage.setItem("userInfo", JSON.stringify(response.user));
+        // 将后台返回的综合测评信息存入浏览器localStorage
+        localStorage.setItem("Comprehensive", JSON.stringify(response.Comprehensive));
         resolve(response)
       }).catch(error => {
         reject(error)

@@ -138,7 +138,10 @@ export default {
           this.dialogVisible = true
           this.title = msg
           }else {
-            alert(msg)
+            this.$message({
+            message: msg,
+            type: "error"
+          });
           }
       });
     },

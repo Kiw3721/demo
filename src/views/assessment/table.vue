@@ -103,7 +103,6 @@
                 show-word-limit
                 clearable
                 :style="{ width: '100%' }"
-                @click="getsixiangfenxj"
               ></el-input>
             </el-form-item>
           </el-col>
@@ -172,6 +171,7 @@
             <el-form-item label="学业分得分(*70%后)" prop="xueyefen">
               <el-input
                 v-model="formData.xueyefen"
+                
                 placeholder="请输入分数"
                 show-word-limit
                 clearable
@@ -253,8 +253,9 @@
         </div>
         <el-col :span="24">
           <el-form-item size="large" style="text-align: center">
-            <el-button type="primary" @click="submitForm">提交</el-button>
-            <el-button @click="resetForm">重置</el-button>
+            <el-button type="primary" @click="submitForm" v-show="show">提交</el-button>
+            <el-button type="primary" @click="updateForm">修改</el-button>
+            <el-button @click="resetForm">审核状态</el-button>
           </el-form-item>
         </el-col>
       </el-form>
@@ -263,8 +264,12 @@
 </template>
 
 <script>
+import { submitComprehensive ,updateComprehensive,selectComprehensiveById} from "@/api/comprehensive";
+
+
 export default {
   props: [],
+  inject:['reload'],
   data() {
     return {
       formData: {
@@ -439,24 +444,166 @@ export default {
           },
         ],
       },
+      show:true
     };
   },
   computed: {
     
   },
   watch: {},
-  created() {},
+  created() {
+    const hasUserInfo = localStorage.getItem('userInfo')
+    console.log("aaaaaa"+ hasUserInfo);  //string
+    if(hasUserInfo === "undefined"){
+      console.log("未填写个人信息")
+    }else{
+      this.show = false
+      this.selectComprehensiveById()
+    }
+  },
   mounted() {},
   methods: {
     submitForm() {
       const sId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      let data = {
+        sxzzgn: this.formData.sxzzgn,
+        jlgn:this.formData.jlgn,
+        jcwmxy:this.formData.jcwmxy,
+        jtgn:this.formData.jtgn,
+        xsgybx:this.formData.xsgybx,
+        shsj:this.formData.shsj,
+        sixiangfenjf:this.formData.sixiangfenjf,
+        sixiangfenkf:this.formData.sixiangfenkf,
+        sixiangfenxj:this.formData.sixiangfenxj,
+        sixiangfen:this.formData.sixiangfen,
+        xsgybx:this.formData.xsgybx,
+        xueyefenjf:this.formData.xueyefenjf,
+        xueyefenkf:this.formData.xueyefenkf,
+        xueyefen:this.formData.xueyefen,
+        xyfxiaoji:this.formData.xyfxiaoji,
+        tiyuke:this.formData.tiyuke,
+        wthd:this.formData.wthd,
+        wentifenjf:this.formData.wentifenjf,
+        wentifenkf:this.formData.wentifenkf,
+        wentifenxj:this.formData.wentifenxj,
+        wentifen:this.formData.wentifen,
+        studentId:sId
+      };
+      submitComprehensive(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        if( code == 200) { 
+          // 将后台返回的JSON数据存入浏览器localStorage
+        localStorage.setItem("Comprehensive", JSON.stringify(res.Comprehensive));
+         this.$message({
+            message: msg,
+            type: "success"
+          });
+          this.show=false
+          }else {
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("录入失败！"+msg);
+            return false;
+          }
+      })
       
     },
     resetForm() {
       this.$refs["elForm"].resetFields();
     },
-    getsixiangfenxj(){
-      this.formData.sixiangfenxj = this.formData.sxzzgn+this.formData.jlgn+this.formData.jcwmxy+this.formData.jtgn+this.formData.xsgybx+this.formData.shsj+this.formData.sixiangfenjf-this.formData.sixiangfenkf
+    updateForm(){
+      const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      let data = {
+        sxzzgn: this.formData.sxzzgn,
+        jlgn:this.formData.jlgn,
+        jcwmxy:this.formData.jcwmxy,
+        jtgn:this.formData.jtgn,
+        xsgybx:this.formData.xsgybx,
+        shsj:this.formData.shsj,
+        sixiangfenjf:this.formData.sixiangfenjf,
+        sixiangfenkf:this.formData.sixiangfenkf,
+        sixiangfenxj:this.formData.sixiangfenxj,
+        sixiangfen:this.formData.sixiangfen,
+        xsgybx:this.formData.xsgybx,
+        xueyefenjf:this.formData.xueyefenjf,
+        xueyefenkf:this.formData.xueyefenkf,
+        xueyefen:this.formData.xueyefen,
+        xyfxiaoji:this.formData.xyfxiaoji,
+        tiyuke:this.formData.tiyuke,
+        wthd:this.formData.wthd,
+        wentifenjf:this.formData.wentifenjf,
+        wentifenkf:this.formData.wentifenkf,
+        wentifenxj:this.formData.wentifenxj,
+        wentifen:this.formData.wentifen,
+        studentId:studentId
+      };
+      updateComprehensive(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        if( code == 200) {
+         this.$message({
+            message: msg,
+            type: "success"
+          });
+          this.show=false
+          this.reload()
+          }else {
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("修改失败！"+msg);
+          }
+      })
+    },
+    selectComprehensiveById(){
+      const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      console.log("12345",studentId)
+      let data = {studentId:studentId}
+      console.log("1111",data)
+      selectComprehensiveById(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        var Comprehensive = res.list
+        if(code == 200){
+          this.$message({
+            message: msg,
+            type: "success"
+          });
+          this.show=false
+           this.formData.sxzzgn = Comprehensive.sxzzgn,
+            this.formData.jlgn = Comprehensive.jlgn,
+            this.formData.jcwmxy = Comprehensive.jcwmxy,
+            this.formData.jtgn = Comprehensive.jtgn,
+            this.formData.xsgybx = Comprehensive.xsgybx,
+            this.formData.shsj= Comprehensive.shsj,
+            this.formData.sixiangfenjf=Comprehensive.sixiangfenjf,
+            this.formData.sixiangfenkf = Comprehensive.sixiangfenkf,
+            this.formData.sixiangfenxj = Comprehensive.sixiangfenxj,
+            this.formData.sixiangfen = Comprehensive.sixiangfen,
+            this.formData.xsgybx = Comprehensive.xsgybx,
+            this.formData.xueyefenjf = Comprehensive.xueyefenjf,
+            this.formData.xueyefenkf = Comprehensive.xueyefenkf,
+            this.formData.xueyefen = Comprehensive.xueyefen,
+            this.formData.xyfxiaoji = Comprehensive.xyfxiaoji,
+            this.formData.tiyuke = Comprehensive.tiyuke,
+            this.formData.wthd = Comprehensive.wthd,
+            this.formData.wentifenjf = Comprehensive.wentifenjf,
+            this.formData.wentifenkf = Comprehensive.wentifenkf,
+            this.formData.wentifenxj = Comprehensive.wentifenxj,
+            this.formData.wentifen = Comprehensive.wentifen
+        }else{
+          this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("获取失败！"+msg);
+            return false;
+        }
+      })
     }
   },
 };

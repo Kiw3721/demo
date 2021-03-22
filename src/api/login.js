@@ -8,6 +8,15 @@ export function login(data) {
   })
 }
 
+//修改Mima
+export function changePassword(data) {
+  return request({
+    url: '/changePassword',
+    method: 'post',
+    data
+  })
+}
+
 
 
 // export function getInfo(params) {
