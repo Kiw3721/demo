@@ -163,7 +163,7 @@
 </template>
 
 <script>
-import { selectComprehensive} from '@/api/comprehensive'
+import { selectComprehensiveById} from '@/api/comprehensive'
 import { getAllStudent ,StudentList} from '@/api/student'
 
 export default {
@@ -396,9 +396,9 @@ export default {
       // this.selectComprehensive(s_id)
       this.dialogTableVisible = true;
     },
-    selectComprehensive(studentId){
+    selectComprehensiveById(studentId){
       let data = {studentId:studentId}
-      selectComprehensive(data).then((res)=>{
+      selectComprehensiveById(data).then((res)=>{
         this.comprehensive = res.list;
         console.log(this.comprehensive,"123456") 
         this.dialogTableVisible = true;

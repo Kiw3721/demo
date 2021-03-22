@@ -255,11 +255,27 @@
           <el-form-item size="large" style="text-align: center">
             <el-button type="primary" @click="submitForm" v-show="show">提交</el-button>
             <el-button type="primary" @click="updateForm">修改</el-button>
-            <el-button @click="resetForm">审核状态</el-button>
+            <el-badge value="new" class="item">
+                <el-button @click="dialogVisible = true">审核状态</el-button>
+            </el-badge>
           </el-form-item>
         </el-col>
       </el-form>
     </el-row>
+
+    <el-dialog
+      :title="title"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :modal-append-to-body="false"
+    >
+      <span>审核状态：{{status}}</span>
+      <span>反馈信息：{{message}}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -295,6 +311,10 @@ export default {
         wentifenxj: '',
         wentifen: '',
       },
+      title:"审核结果",
+      status:"未审核",
+      message:"无",
+      dialogVisible:false,
       rules: {
         sxzzgn: [
           {
@@ -465,6 +485,11 @@ export default {
   methods: {
     submitForm() {
       const sId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      this.formData["studentId"]=JSON.stringify(sId)
+      console.log("000000000",this.formData.studentId)
+      // this.formData['studentId']=sId
+      // this.$refs["formData"].append('studentId',sId)
+      // console.log("biaodanshuju shi ?",this.formData)
       let data = {
         sxzzgn: this.formData.sxzzgn,
         jlgn:this.formData.jlgn,
@@ -493,8 +518,6 @@ export default {
         var code = res.statusCode
         var msg = res.msg
         if( code == 200) { 
-          // 将后台返回的JSON数据存入浏览器localStorage
-        localStorage.setItem("Comprehensive", JSON.stringify(res.Comprehensive));
          this.$message({
             message: msg,
             type: "success"
@@ -512,7 +535,7 @@ export default {
       
     },
     resetForm() {
-      this.$refs["elForm"].resetFields();
+      this.$refs["formData"].resetFields();
     },
     updateForm(){
       const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
@@ -568,13 +591,17 @@ export default {
         var code = res.statusCode
         var msg = res.msg
         var Comprehensive = res.list
+        console.log()
         if(code == 200){
           this.$message({
             message: msg,
             type: "success"
           });
-          this.show=false
-           this.formData.sxzzgn = Comprehensive.sxzzgn,
+          if(Comprehensive.length == 0){
+            this.show=true
+          }else{
+            this.show=false
+            this.formData.sxzzgn = Comprehensive.sxzzgn,
             this.formData.jlgn = Comprehensive.jlgn,
             this.formData.jcwmxy = Comprehensive.jcwmxy,
             this.formData.jtgn = Comprehensive.jtgn,
@@ -595,6 +622,7 @@ export default {
             this.formData.wentifenkf = Comprehensive.wentifenkf,
             this.formData.wentifenxj = Comprehensive.wentifenxj,
             this.formData.wentifen = Comprehensive.wentifen
+          }
         }else{
           this.$message({
             message: msg,
@@ -636,5 +664,9 @@ span {
   font-size: 25px;
   display: block;
   text-align: center;
+}
+
+.item {
+  margin-left: 20px;
 }
 </style>

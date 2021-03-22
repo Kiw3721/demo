@@ -82,8 +82,8 @@ export default {
     // }
     sureLogout() {
       // window.localStorage.removeItem("user")
-      localStorage.removeItem("user");
-      localStorage.removeItem("account");
+      // localStorage.removeItem("user");
+      // localStorage.removeItem("account");
       localStorage.clear()
       console.log("退出成功！");
       window.location.reload()

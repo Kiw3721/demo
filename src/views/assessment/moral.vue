@@ -80,7 +80,10 @@
     <hr />
     <table class="table table-bordered table-hover">
       <caption class="h3 text-info" style="margin-bottom:10px;">
-        活动来源表
+        <span>活动来源表</span>
+        <el-badge value="new" class="item">
+            <el-button size="mini" @click="dialogVisible = true">审核状态</el-button>
+        </el-badge>
       </caption>
       <tr class="text-danger">
         <th class="text-center">序号</th>
@@ -107,18 +110,7 @@
           </button>
         </td>
       </tr>
-      <!-- <tr v-show="myData.length != 0">
-        <td colspan="4" class="text-right">
-          <button
-            class="btn btn-danger btn-sm"
-            data-toggle="modal"
-            data-target="#layer"
-            @click="nowIndex = -2"
-          >
-            删除全部
-          </button>
-        </td>
-      </tr> -->
+
       <tr v-show="myData.length == 0">
         <td colspan="4" class="text-center text-muted">
           <p>暂无数据....</p>
@@ -142,7 +134,7 @@
             <h4 class="modal-title">确认删除么?</h4>
           </div>
           <div class="modal-body text-right">
-            <button data-dismiss="modal" class="btn btn-primary btn-sm">
+            <button data-dismiss="modal" class="btn btn-primary btn-sm" style="margin-left:10px">
               取消
             </button>
             <button
@@ -156,6 +148,21 @@
         </div>
       </div>
     </div>
+
+          <!-- 审核状态弹出款 -->
+      <el-dialog
+      :title="title"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :modal-append-to-body="false"
+    >
+      <span>审核状态：{{status}}</span>
+      <br>
+      <span>反馈信息：{{message}}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -186,6 +193,10 @@ export default {
           value: '文体分',
           label: '文体分'
         }],
+      title:"审核结果",
+      status:"未审核",
+      message:"无",
+      dialogVisible:false,
     };
   },
   created() {
@@ -324,5 +335,8 @@ export default {
 }
 .form-control {
   width: 500px;
+}
+.item {
+  margin-left: 20px;
 }
 </style>
