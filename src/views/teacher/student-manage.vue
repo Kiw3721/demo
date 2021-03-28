@@ -399,7 +399,7 @@ export default {
     let data={
       s_name:this.listQuery.name,
       s_number:this.listQuery.number,
-      s_college:this.listQuery.majorClass,
+      s_college:JSON.stringify(this.listQuery.majorClass),
       page:this.pageNo,
       pageSize:this.pageCount
     }

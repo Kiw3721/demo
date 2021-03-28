@@ -162,17 +162,18 @@
       </el-table-column>
 
       <el-table-column label="等级" width="400px" align="center">
-        <template >
-          <el-button type="info" size="mini" >
+        <template slot-scope="scope">
+  
+          <el-button type="info" size="mini" v-show="scope.$index<=9" >
             一等奖
           </el-button>
-          <el-button type="info" size="mini" >
+          <el-button type="info" size="mini" v-show="scope.$index>9&&scope.$index<=19">
             二等奖
           </el-button>
-          <el-button type="info" size="mini" >
+          <el-button type="info" size="mini" v-show="scope.$index>19&&scope.$index<=29" >
             三等奖
           </el-button>
-          <el-button type="info" size="mini" >
+          <el-button type="info" size="mini" v-show="scope.$index>29" >
             无
           </el-button>
         </template>
@@ -184,12 +185,16 @@
         width="230"
         class-name="small-padding fixed-width"
       >
+      <!-- <template >
+          <el-button type="primary" size="mini" >
+            
+          </el-button>
+        </template> -->
         <template slot-scope="{ row }">
-          <el-button type="primary" size="mini" v-if="scope.row.state==-1"> 未审核 </el-button>
-          <el-button type="primary" size="mini" v-if="scope.row.state==0"> 待处理 </el-button>
-          <el-button type="primary" size="mini" v-if="scope.row.state==1"> 已反馈 </el-button>
-          <el-button type="primary" size="mini" v-if="scope.row.state==1"> 审核成功 </el-button>
-        </template>
+          <el-button type="primary" size="mini" v-if="row.state==null" @click.native="state(row)"> 未审核 </el-button>
+          <el-button type="primary" size="mini" v-if="row.state==1"> 通过审核 </el-button> 
+          <el-button type="primary" size="mini" v-if="row.state==2"> 拒绝通过 </el-button> 
+       </template>
       </el-table-column>
     </el-table>
 
@@ -215,15 +220,34 @@
         <el-table-column prop="score" label="分数"> </el-table-column>
       </el-table>
     </el-dialog>
+
+<!-- 审核表单 -->
+    <el-dialog title="审核信息" :visible.sync="dialogFormVisible">
+  <el-form >
+    <el-form-item label="学生姓名" label-width="200px">
+      {{ studentlist.s_name}}
+    </el-form-item>
+    <el-form-item label="备注" label-width="200px">
+      <el-input v-model="beizhu" ></el-input>
+    </el-form-item>
+  
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogFormVisible = false">取 消</el-button>
+    <el-button type="primary" @click="stateok(1)">通过</el-button>
+        <el-button type="primary" @click="stateok(2)">拒绝</el-button>
+  </div>
+</el-dialog>
   </div>
 </template>
 
 <script>
-import { selectComprehensiveById,ComprehensiveList} from '@/api/comprehensive'
+import { selectComprehensiveById,updateComprehensive,ComprehensiveList} from '@/api/comprehensive'
 // import { getAllStudent ,StudentList} from '@/api/student'
 
 export default {
   name: "ComplexTable",
+  inject:['reload'],
   data() {
     return {
       listLoading: true,
@@ -232,6 +256,7 @@ export default {
         name: "",
         number:""
       },
+      beizhu:null,//审批备注
       ComprehensiveList: [],
       options: [
         {
@@ -512,7 +537,9 @@ export default {
       pageCount:10,//数据数
       currentNo:1,//当前页码
       allData:[],//全部数据
-      totalPage:1//总页码
+      totalPage:1,//总页码
+      studentlist:{},//学生详情
+      dialogFormVisible:false,
     };
   },
   created() {
@@ -676,6 +703,44 @@ export default {
     this.listQuery.number=""
     this.getComprehensiveList()
     this.getPageTotal()
+  },
+  stateok(sum){
+      let data ={
+      studentId:this.studentlist.s_id,
+      state:sum,
+      beizhu:this.beizhu,
+    }
+    updateComprehensive(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        if( code == 200) {
+         this.$message({
+            message: msg,
+            type: "success"
+          });
+          this.dialogFormVisible=false
+          // this.getComprehensiveList()
+          // this.getPageTotal()
+          this.reload()
+          }else {
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("修改失败！"+msg);
+          }
+      })
+  
+  },
+  state(v){
+ //   const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
+    //  this.$set(v,'studentId',v.s_id) 
+    //    this.$set(v,'s_college',JSON.stringify(v.s_college)) 
+    //  this.$set(v,'state',1)
+    this.studentlist=v
+    this.dialogFormVisible=true
+
+
   }
   },
  

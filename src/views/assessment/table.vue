@@ -269,8 +269,8 @@
       width="30%"
       :modal-append-to-body="false"
     >
-      <span>审核状态：{{status}}</span>
-      <span>反馈信息：{{message}}</span>
+      <span>审核状态：{{this.formData.state==null?'未审核':this.formData.state==1?'通过':'未通过'}}</span>
+      <span>反馈信息：{{this.formData.beizhu}}</span>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
       </span>
@@ -289,6 +289,7 @@ export default {
   data() {
     return {
       formData: {
+        beizhu:'',
         sxzzgn: '',
         jlgn: '',
         jcwmxy: '',
@@ -315,6 +316,7 @@ export default {
       status:"未审核",
       message:"无",
       dialogVisible:false,
+      
       rules: {
         sxzzgn: [
           {
@@ -592,39 +594,42 @@ export default {
       selectComprehensiveById(data).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
-        var Comprehensive = res.list
-        console.log()
+        // var Comprehensive = res.list
+        // this.formData = res.list
+        // console.log()
         if(code == 200){
           this.$message({
             message: msg,
             type: "success"
           });
-          if(Comprehensive.length == 0){
-            this.show=true
-          }else{
-            this.show=false
-            this.formData.sxzzgn = Comprehensive.sxzzgn,
-            this.formData.jlgn = Comprehensive.jlgn,
-            this.formData.jcwmxy = Comprehensive.jcwmxy,
-            this.formData.jtgn = Comprehensive.jtgn,
-            this.formData.xsgybx = Comprehensive.xsgybx,
-            this.formData.shsj= Comprehensive.shsj,
-            this.formData.sixiangfenjf=Comprehensive.sixiangfenjf,
-            this.formData.sixiangfenkf = Comprehensive.sixiangfenkf,
-            this.formData.sixiangfenxj = Comprehensive.sixiangfenxj,
-            this.formData.sixiangfen = Comprehensive.sixiangfen,
-            this.formData.xxcj = Comprehensive.xxcj,
-            this.formData.xueyefenjf = Comprehensive.xueyefenjf,
-            this.formData.xueyefenkf = Comprehensive.xueyefenkf,
-            this.formData.xueyefen = Comprehensive.xueyefen,
-            this.formData.xyfxiaoji = Comprehensive.xyfxiaoji,
-            this.formData.tiyuke = Comprehensive.tiyuke,
-            this.formData.wthd = Comprehensive.wthd,
-            this.formData.wentifenjf = Comprehensive.wentifenjf,
-            this.formData.wentifenkf = Comprehensive.wentifenkf,
-            this.formData.wentifenxj = Comprehensive.wentifenxj,
-            this.formData.wentifen = Comprehensive.wentifen
-          }
+          this.formData = res.list
+
+          // if(Comprehensive.length == 0){
+          //   this.show=true
+          // }else{
+          //   this.show=false
+          //   this.formData.sxzzgn = Comprehensive.sxzzgn,
+          //   this.formData.jlgn = Comprehensive.jlgn,
+          //   this.formData.jcwmxy = Comprehensive.jcwmxy,
+          //   this.formData.jtgn = Comprehensive.jtgn,
+          //   this.formData.xsgybx = Comprehensive.xsgybx,
+          //   this.formData.shsj= Comprehensive.shsj,
+          //   this.formData.sixiangfenjf=Comprehensive.sixiangfenjf,
+          //   this.formData.sixiangfenkf = Comprehensive.sixiangfenkf,
+          //   this.formData.sixiangfenxj = Comprehensive.sixiangfenxj,
+          //   this.formData.sixiangfen = Comprehensive.sixiangfen,
+          //   this.formData.xxcj = Comprehensive.xxcj,
+          //   this.formData.xueyefenjf = Comprehensive.xueyefenjf,
+          //   this.formData.xueyefenkf = Comprehensive.xueyefenkf,
+          //   this.formData.xueyefen = Comprehensive.xueyefen,
+          //   this.formData.xyfxiaoji = Comprehensive.xyfxiaoji,
+          //   this.formData.tiyuke = Comprehensive.tiyuke,
+          //   this.formData.wthd = Comprehensive.wthd,
+          //   this.formData.wentifenjf = Comprehensive.wentifenjf,
+          //   this.formData.wentifenkf = Comprehensive.wentifenkf,
+          //   this.formData.wentifenxj = Comprehensive.wentifenxj,
+          //   this.formData.wentifen = Comprehensive.wentifen
+          // }
         }else{
           this.$message({
             message: msg,
