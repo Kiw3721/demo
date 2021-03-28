@@ -34,10 +34,10 @@
         />
       </div>
       <div class="form-group">
-        <label for="activityProof">证明:</label>
+        <label for="activityProofName">证明:</label>
         <input
-          id="activityProof"
-          v-model="activityProof"
+          id="activityProofName"
+          v-model="activityProofName"
           type="text"
           class="form-control"
           placeholder="上传图片"
@@ -53,6 +53,7 @@
         :on-preview="handlePreview"
         :on-remove="handleRemove"
         :before-remove="beforeRemove"
+        :on-change="onBeforeUpload"
         multiple
         :limit="1"
         :on-exceed="handleExceed"
@@ -62,7 +63,7 @@
         <el-button size="small" type="primary">点击上传</el-button>
         <template #tip>
           <div class="el-upload__tip">
-            只能上传 jpg/png 文件，且不超过 500kb
+            只能上传 jpg/png 文件，且不超过 1MB
           </div>
         </template>
       </el-upload>
@@ -98,7 +99,7 @@
         <td>{{ item.activityType }}</td>
         <td>{{ item.activityName }}</td>
         <td>{{ item.activityNum }}</td>
-        <td @click="Proofshow(item)"><a href="javascript:"> {{ item.activityProofPic }}</a></td>
+        <td @click="Proofshow(item.activityProofPath)"><a href="javascript:"> {{ item.activityProofPic }}</a></td>
         <td>
           <button
             class="btn btn-primary btn-sm"
@@ -168,6 +169,7 @@
 
 <script>
 import { addProof, deleteProof,searchProof} from "@/api/activityProof";
+import { deleteFiles} from "@/api/files";
 
 export default {
   data() {
@@ -176,7 +178,7 @@ export default {
       activityType: "",
       activityName: "",
       activityNum: "",
-      activityProof: "",
+      activityProofName: "",
       nowIndex: -100,
       //控制图片预览窗口的显示与隐藏
       previewVisible: false,
@@ -201,17 +203,16 @@ export default {
   },
   created() {
 	this.activityType = this.options[0].value
-  this.reset()
+  this.updateProof()
   },
   methods: {
-    reset(){
+    // 更新已上传的证明
+    updateProof(){
       const studentId = JSON.parse(localStorage.getItem("userInfo")).s_id;
-        // const proofPic = JSON.parse(localStorage.getItem("Proof")).pic;
-        // console.log("66666" + proofPic);
         let data = {
           activityName: this.activityName,
           activityNum: this.activityNum,
-          activityProofPic: this.activityProof,
+          activityProofPic: this.activityProofName,
           activityType: this.activityType,
           studentId: studentId,
         };
@@ -219,20 +220,59 @@ export default {
         this.myData = res.data
         })
     },
+    // 上传设置
+    onBeforeUpload(file)
+    {
+      let testFile = file.name.substring(file.name.lastIndexOf('.') + 1).toLowerCase()
+      console.log("file的类型:"+testFile)
+      const isIMAGE = testFile === 'jpg' || testFile === 'png';
+      console.log("file的类型:"+isIMAGE)
+      const isLt1M = file.size / 1024 / 1024 < 1;
+
+      if (!isIMAGE) {
+        this.$message.warning('上传文件只能是图片格式!');
+        this.fileList = []
+        return false;
+      }
+      if (!isLt1M) {
+        this.$message.warning('上传文件大小不能超过 1MB!');
+        this.fileList = []
+        return false;
+      }
+      return isIMAGE && isLt1M;
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`只能选择一张图片证明`);
+    },
     handleRemove(file, fileList) {
-      this.activityProof = "";
+      this.activityProofName = "";
+      this.deleteFile(file.pic)
       console.log("11111111", file, fileList);
+    },
+    // 删除图片接口
+    deleteFile(proofPath){
+      console.log(proofPath,"zzzzz")
+      let data ={
+        path:proofPath
+      }
+      deleteFiles(data).then((res)=>{
+        var code = res.statusCode;
+        var msg = res.msg;
+        if (code == 200) {
+            this.$message({
+              message: msg,
+              type: "success",
+            });
+          } 
+      })
     },
     //触发图片预览
     handlePreview(file) {
       const files = JSON.stringify(file);
       console.log("file:" + files);
-      this.previewPath = file.pic;
+      this.previewPath = "http://localhost:3000/"+file.pic;
       console.log("1231221" + this.previewPath);
       this.previewVisible = true;
-    },
-    handleExceed(files, fileList) {
-      this.$message.warning(`只能选择一张图片证明`);
     },
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
@@ -241,23 +281,26 @@ export default {
     handleSuccess(response) {
       //拼接得到图片信息对象
       const picInfo = { name: response.data.name, pic: response.data.path2 };
-      // 将修改后的综合测评信息存入浏览器localStorage
+      // // 将修改后的综合测评信息存入浏览器localStorage
       localStorage.setItem("Proof", JSON.stringify(picInfo));
       console.log("图片信息：" + picInfo);
       //将图片信息对象，push到pics数组中
       this.fileList.push(picInfo);
-      this.activityProof = picInfo.name;
+      this.activityProofName = picInfo.name;
       console.log("图片信息：" + this.fileList);
     },
-    // Proofshow(v){
-    //   window.location.href=`http://localhost:3000/downloadFile?url=${v.activityProofPath}&filename=${v.activityProofPic}`
-    // },
+    Proofshow(path){
+      console.log("1111"+path)
+      this.previewVisible = true;
+      this.previewPath = "http://localhost:3000/"+path;
+    },
+    // 上传证明信息
     add() {
       if (this.activityName === "") {
         alert("活动名称不能为空");
       } else if (this.activityNum === "") {
         alert("所得分数不能为空");
-      } else if (this.activityProof === "") {
+      } else if (this.activityProofName === "") {
         alert("还没上传证明图片");
       } else {
         const studentId = JSON.parse(localStorage.getItem("userInfo")).s_id;
@@ -266,7 +309,7 @@ export default {
         let data = {
           activityName: this.activityName,
           activityNum: this.activityNum,
-          activityProofPic: this.activityProof,
+          activityProofPic: this.activityProofName,
           activityProofPath: proofPic,
           activityType: this.activityType,
           studentId: studentId,
@@ -290,16 +333,17 @@ export default {
           activityType: this.activityType,
           activityName: this.activityName,
           activityNum: this.activityNum,
-          activityProof: this.activityProof,
+          activityProofPic: this.activityProofName,
         });
 
         this.activityName = "";
         this.activityNum = "";
-        this.activityProof = "";
+        this.activityProofName = "";
         this.fileList.splice(0, this.fileList.length); //清空数组
       }
       //   alert('添加')
     },
+    // 删除证明信息
     deleteMsg(n) {
       console.log("qwqedwfew",this.myData[n].activityName)
         let data = {
@@ -309,11 +353,13 @@ export default {
       deleteProof(data).then((res)=>{
          var code = res.statusCode;
           var msg = res.msg;
+          var proofPath=res.data
           if (code == 200) {
             this.$message({
               message: msg,
               type: "success",
             });
+            this.deleteFile(proofPath)
           } else {
             this.$message({
               message: msg,
@@ -322,7 +368,6 @@ export default {
           }
       })
       this.myData.splice(n, 1);
-      
     },
   },
 };
@@ -338,5 +383,10 @@ export default {
 }
 .item {
   margin-left: 20px;
+}
+
+.previewImg{
+  width: 100%;
+  height: 100%;
 }
 </style>

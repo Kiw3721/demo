@@ -213,9 +213,28 @@
           >修改</el-button
         >
 
-        <el-button @click="resetForm('applyForm')">重置</el-button>
+        <el-badge value="new" class="item">
+                <el-button @click="dialogVisible = true">审核状态</el-button>
+            </el-badge>
+
+        
       </el-form-item>
     </el-form>
+
+    <el-dialog
+      :title="title"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :modal-append-to-body="false"
+    >
+      <span>审核状态：{{status}}</span>
+      <br>
+      <span>反馈信息：{{message}}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -429,7 +448,11 @@ export default {
         ],
         yearInput: [{ required: true, message: "必填项", trigger: "blur" }]
       },
-      show:true
+      show:true,
+      title:"审核结果",
+      status:"未审核",
+      message:"无",
+      dialogVisible:false,
     };
   },
   computed: {},
@@ -438,7 +461,6 @@ export default {
    if(hasUserInfo === "undefined"){
       console.log("未填写个人信息")
     }else{
-      this.show = false
       this.applyForm.name = hasUserInfo.s_name,
       this.applyForm.number = hasUserInfo.s_number,
       this.applyForm.gender = hasUserInfo.s_gender,
@@ -446,8 +468,14 @@ export default {
       this.applyForm.idCard = hasUserInfo.s_idCard,
       this.applyForm.region = hasUserInfo.s_address,
       this.applyForm.telephone = hasUserInfo.s_telephone
-      this.searchApplyById()
+      if(!this.show){
+        this.searchApplyById()
+      }
+      
     }
+  },
+  mounted(){
+    
   },
   methods: {
     submitForm() {
@@ -504,16 +532,28 @@ export default {
       let data = {studentId:studentId}
       searchApplyById(data).then((res)=>{
         var code = res.statusCode
+        var msg = res.msg
         if( code == 200) { 
+           this.$message({
+            message: msg,
+            type: "success"
+          });
           this.applyForm = res.data
           this.applyForm.majorClass = JSON.parse(res.data.majorClass)
           this.show = false
+          }else{
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("获取失败！"+msg);
+            return false;
           }
       })
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-    },
+    // resetForm(formName) {
+    //   this.$refs[formName].resetFields();
+    // },
     handleChange(value) {
       console.log(value,'dfsd');
       console.log("zzzz"+this.applyForm.majorClass)

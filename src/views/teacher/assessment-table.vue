@@ -1,7 +1,14 @@
 <template>
   <div id="app-container">
     <div class="filter-container">
-      <el-select
+      <el-cascader
+          :options="options"
+          placeholder="请选择学院-专业-班级"
+          v-model="listQuery.majorClass"
+          :props="{ expandTrigger: 'hover' }"
+          style="margin-right:15px"
+        ></el-cascader>
+      <!-- <el-select
         v-model="listQuery.collage"
         placeholder="学院"
         clearable
@@ -28,7 +35,7 @@
           :label="item"
           :value="item"
         />
-      </el-select>
+      </el-select> -->
       <el-input
         v-model="listQuery.name"
         placeholder="姓名"
@@ -36,41 +43,47 @@
         class="filter-item"
       />
 
+      <el-input
+        v-model="listQuery.number"
+        placeholder="学号"
+        style="width: 130px;"
+        class="filter-item"
+      />
+
       <el-button
-       
         class="filter-item"
         type="primary"
         icon="el-icon-search"
+        @click="handleSearch"
       >
         搜索
       </el-button>
-      <!-- @click="handleFilter" -->
+      
 
-      <!-- <el-button
-        v-waves
-        :loading="downloadLoading"
+       <el-button
         class="filter-item"
         type="primary"
-        icon="el-icon-download"
+        icon="el-icon-refresh"
+        @click="handlerefresh"
       >
-        下载
-      </el-button> -->
-      <!-- @click="handleDownload" -->
+        重置
+      </el-button>
     </div>
 
 <!-- v-loading="listLoading" -->
     <el-table
       
-      :data="studentList"
+      :data="ComprehensiveList"
       border
       fit
       highlight-current-row
       style="width: 100%"
+      
     >
+    <!-- @sort-change='sortChange' -->
       <el-table-column
         label="ID"
         prop="s_id"
-        sortable="custom"
         align="center"
         width="80"
       >
@@ -94,21 +107,41 @@
         </template>
       </el-table-column>
 
-       <el-table-column label="学院" prop="s_college" width="250px" align="center">
+       <el-table-column label="学院" prop="s_college" width="200px" align="center">
         <template slot-scope="{row}">
             <span>{{row.s_college?row.s_college[0]:'' }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="专业" prop="s_grade" width="200px" align="center">
+      <el-table-column label="专业" prop="s_grade" width="160px" align="center">
         <template slot-scope="{row}">
             <span>{{row.s_college?row.s_college[1]:'' }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="班级" prop="s_grade" width="100px" align="center">
+      <el-table-column label="班级" prop="s_grade" width="80px" align="center">
         <template slot-scope="{row}">
             <span>{{row.s_college?row.s_college[2]:'' }}</span>
+        </template>
+      </el-table-column>
+       <el-table-column label="思想分" prop="sixiangfen" width="80px" align="center">
+        <template slot-scope="{row}">
+            <span>{{row.sixiangfen }}</span>
+        </template>
+      </el-table-column>
+       <el-table-column label="学业分" prop="xueyefen" width="80px" align="center">
+        <template slot-scope="{row}">
+            <span>{{row.xueyefen }}</span>
+        </template>
+      </el-table-column>
+       <el-table-column label="文体分" prop="wentifen" width="80px" align="center">
+        <template slot-scope="{row}">
+            <span>{{row.wentifen }}</span>
+        </template>
+      </el-table-column>
+       <el-table-column label="综合分" prop="zonghefen" width="120px" align="center">
+        <template slot-scope="{row}">
+            <span>{{Number(row.zonghefen)}}</span>
         </template>
       </el-table-column>
 
@@ -120,19 +153,42 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="奖扣分细则" width="150px" align="center">
+        <template slot-scope="{ row }">
+          <el-button type="primary" size="mini" @click.native="watchContent(row.s_id)">
+            查看
+          </el-button>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="等级" width="400px" align="center">
+        <template >
+          <el-button type="info" size="mini" >
+            一等奖
+          </el-button>
+          <el-button type="info" size="mini" >
+            二等奖
+          </el-button>
+          <el-button type="info" size="mini" >
+            三等奖
+          </el-button>
+          <el-button type="info" size="mini" >
+            无
+          </el-button>
+        </template>
+      </el-table-column>
+
       <el-table-column
-        label="复审"
+        label="审核情况"
         align="center"
         width="230"
         class-name="small-padding fixed-width"
       >
-        <!-- <template slot-scope="{ row }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            未审核
-          </el-button>
-        </template> -->
-        <template>
-          <el-button type="primary" size="mini"> 未审核 </el-button>
+        <template slot-scope="{ row }">
+          <el-button type="primary" size="mini" v-if="scope.row.state==-1"> 未审核 </el-button>
+          <el-button type="primary" size="mini" v-if="scope.row.state==0"> 待处理 </el-button>
+          <el-button type="primary" size="mini" v-if="scope.row.state==1"> 已反馈 </el-button>
+          <el-button type="primary" size="mini" v-if="scope.row.state==1"> 审核成功 </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -163,8 +219,8 @@
 </template>
 
 <script>
-import { selectComprehensiveById} from '@/api/comprehensive'
-import { getAllStudent ,StudentList} from '@/api/student'
+import { selectComprehensiveById,ComprehensiveList} from '@/api/comprehensive'
+// import { getAllStudent ,StudentList} from '@/api/student'
 
 export default {
   name: "ComplexTable",
@@ -172,168 +228,286 @@ export default {
     return {
       listLoading: true,
       listQuery: {
-        collage: "",
-        class: "",
+        majorClass:[],
         name: "",
+        number:""
       },
-      // comprehensive:{
-      //   sxzzgn: "",
-      //   jlgn: "",
-      //   jcwmxy: "",
-      //   jtgn: "",
-      //   xsgybx: "",
-      //   shsj: "",
-      //   sixiangfenjf: "",
-      //   sixiangfenkf: "",
-      //   sixiangfenxj: "",
-      //   sixiangfen: "",
-      //   xxcj: "",
-      //   xueyefenjf: "",
-      //   xueyefenkf: "",
-      //   xyfxiaoji: "",
-      //   xueyefen: "",
-      //   tiyuke: "",
-      //   wthd:"",
-      //   wentifenjf: "",
-      //   wentifenkf: "",
-      //   wentifenxj: "",
-      //   wentifen: ""
-      // },
-      comprehensive:{},
-      studentList: [],
-      collageOptions: ["信科院", "管院", "艺设"],
-      classOptions: ["计算机171", "信管171", "物联网182"],
+      ComprehensiveList: [],
+      options: [
+        {
+          value: "信息科学与技术学院",
+          label: "信息科学与技术学院",
+          children: [
+            {
+              value: "计算机",
+              label: "计算机",
+              children: [
+                {
+                  value: "171",
+                  label: "171班"
+                },
+                {
+                  value: "172",
+                  label: "172班"
+                },
+                {
+                  value: "173",
+                  label: "173班"
+                },
+                {
+                  value: "174",
+                  label: "174班"
+                }
+              ]
+            },
+            {
+              value: "电子信息",
+              label: "电子信息",
+              children: [
+                {
+                  value: "171",
+                  label: "171班"
+                },
+                {
+                  value: "172",
+                  label: "172班"
+                },
+                {
+                  value: "173",
+                  label: "173班"
+                },
+                {
+                  value: "174",
+                  label: "174班"
+                }
+              ]
+            },
+            {
+              value: "信息管理与信息系统",
+              label: "信息管理与信息系统",
+              children: [
+                {
+                  value: "171",
+                  label: "171班"
+                },
+                {
+                  value: "172",
+                  label: "172班"
+                },
+                {
+                  value: "173",
+                  label: "173班"
+                },
+                {
+                  value: "174",
+                  label: "174班"
+                }
+              ]
+            },
+            {
+              value: "物联网",
+              label: "物联网",
+              children: [
+                {
+                  value: "171",
+                  label: "171班"
+                },
+                {
+                  value: "172",
+                  label: "172班"
+                },
+                {
+                  value: "173",
+                  label: "173班"
+                }
+              ]
+            },
+            {
+              value: "大数据",
+              label: "大数据",
+              children: [
+                {
+                  value: "171",
+                  label: "171班"
+                },
+                {
+                  value: "172",
+                  label: "172班"
+                },
+                {
+                  value: "173",
+                  label: "173班"
+                },
+                {
+                  value: "174",
+                  label: "174班"
+                },
+                {
+                  value: "175",
+                  label: "175班"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      // collageOptions: ["信科院", "管院", "艺设"],
+      // classOptions: ["计算机171", "信管171", "物联网182"],
       dialogTableVisible: false,
       tableData: [
         {
           content: "思想分",
           sort: "思想政治观念(15分)",
           // score: this.comprehensive.sxzzgn,
-          score:"13"
+          score:""
         },
         {
           content: "思想分",
           sort: "纪律观念(14分)",
           // score: this.comprehensive.jlgn,
-           score:"13"
+           score:""
         },
         {
           content: "思想分",
           sort: "基础文明修养(13分)",
           // score: this.comprehensive.jcwmxy,
-           score:"13"
+           score:""
         },
         {
           content: "思想分",
           sort: "集体观念(13分)",
           // score:this.comprehensive.jtgn,
-           score:"13"
+           score:""
         },
         {
           content: "思想分",
           sort: "学生公寓表现(15分)",
           // score:this.comprehensive.xsgybx,
-           score:"13"
+           score:""
         },
         {
           content: "思想分",
           sort: "社会实践(15分)",
           // score:this.comprehensive.shsj,
-           score:"13"
+           score:""
         },
         {
           content: "思想分",
           sort: "奖分+(15分)",
           // score:this.comprehensive.sixiangfenjf,
-           score:"13"
+           score:""
         },
         {
           content: "思想分",
           sort: "扣分-",
           // score: this.comprehensive.sixiangfenkf,
-           score:"13"
+           score:""
         },
         {
           content: "思想分",
           sort: "小计(*20%前)",
           // score:this.comprehensive.sixiangfenxj,
-           score:"13"
+           score:""
         },
         {
           content: "思想分",
           sort: "思想品德分得分(*20%后)",
           // score:this.comprehensive.sixiangfen,
-           score:"13"
+           score:""
         },
 
         {
           content: "学业分",
           sort: "学习成绩(90分)",
           // score: this.comprehensive.xxcj,
-           score:"13"
+           score:""
         },
         {
           content: "学业分",
           sort: "奖分+(10分)",
           // score:this.comprehensive.xueyefenjl,
-           score:"13"
+           score:""
         },
         {
           content: "学业分",
           sort: "扣分-",
           // score: this.comprehensive.xueyefenkf,
-           score:"13"
+           score:""
         },
         {
           content: "学业分",
           sort: "小计(*20%前)",
           // score: this.comprehensive.xueyefenxj,
-           score:"13"
+           score:""
         },
         {
           content: "学业分",
           sort: "学业分得分(*70%后)",
           // score: this.comprehensive.xueyefen,
-           score:"13"
+           score:""
         },
         {
           content: "文体分",
           sort: "体育课分(60分)",
           // score: this.comprehensive.tiyuke,
-           score:"13"
+           score:""
         },
         {
           content: "文体分",
           sort: "文体活动分(10分)",
           // score: this.comprehensive.wthd,
-           score:"13"
+           score:""
         },
         {
           content: "文体分",
           sort: "奖分+(30分)",
           // score: this.comprehensive.wentifenjf,
-           score:"13"
+           score:""
         },
         {
           content: "文体分",
           sort: "扣分-",
           // score: this.comprehensive.wentifenkf,
-           score:"13"
+           score:""
         },
         {
           content: "文体分",
           sort: "小计(*10%前)",
           // score: this.comprehensive.wentifenxj,
-           score:"13"
+           score:""
         },
 
         {
           content: "文体分",
           sort: "文体分得分(*10%后)",
           // score: this.comprehensive.wentifen,
-           score:"13"
+           score:""
         },
       ],
+      comprehensive:{
+        sxzzgn: "11",
+        jlgn: "",
+        jcwmxy: "",
+        jtgn: "",
+        xsgybx: "",
+        shsj: "",
+        sixiangfenjf: "",
+        sixiangfenkf: "",
+        sixiangfenxj: "",
+        sixiangfen: "",
+        xxcj: "",
+        xueyefenjf: "",
+        xueyefenkf: "",
+        xyfxiaoji: "",
+        xueyefen: "",
+        tiyuke: "",
+        wthd:"",
+        wentifenjf: "",
+        wentifenkf: "",
+        wentifenxj: "",
+        wentifen: "",
+        zonghefen:""
+      },
       pageNo:1,//表格页码
       pageCount:10,//数据数
       currentNo:1,//当前页码
@@ -342,12 +516,11 @@ export default {
     };
   },
   created() {
-    this.getRowSpan()
-    this.StudentList()
+    this.getComprehensiveList()
     this.getPageTotal()
   },
   methods: {
-    StudentList(index){
+    getComprehensiveList(index){
       this.listLoading = true
       this.pageNo = index || this.pageNo
       console.log("当前页面是第几页？"+this.pageNo)
@@ -356,7 +529,7 @@ export default {
        pageSize:this.pageCount
        }
        console.log("页面个数！"+this.pageCount)
-      StudentList(data).then((res)=>{
+      ComprehensiveList(data).then((res)=>{
         console.log("分页的数据"+res.data);
         res.data.map(val=>{
           if(val.s_college){
@@ -364,7 +537,7 @@ export default {
           }
         })
  
-          this.studentList = res.data
+          this.ComprehensiveList = res.data
           this.listLoading = false
       }).catch(error=>{
           console.log(error);
@@ -375,14 +548,14 @@ export default {
         console.log("页面！！！！"+currentPage)
       this.currentNo = currentPage;
       console.log("当前页数据"+this.currentNo)
-        this.StudentList(this.currentNo)
+        this.getComprehensiveList(this.currentNo)
     },
         //获取总页数
     getPageTotal(){
         this.listLoading = true
-         getAllStudent().then((res)=>{
+         ComprehensiveList().then((res)=>{
               console.log("msgggg"+res.msg)
-              this.allData = res.list;
+              this.allData = res.data;
               this.totalPage = Math.ceil(this.allData.length / this.pageCount) * 10;
               console.log("获取总页数"+this.totalPage);
               this.listLoading = false
@@ -390,17 +563,49 @@ export default {
             console.log(error)
       })
     },
-    
+    // 查看学生自评的数据
     watchStudent(s_id) {
       console.log(s_id,"1111111")
-      // this.selectComprehensive(s_id)
-      this.dialogTableVisible = true;
+      // this.dialogTableVisible = true;
+      this.selectComprehensive(s_id)
     },
-    selectComprehensiveById(studentId){
+    selectComprehensive(studentId){
       let data = {studentId:studentId}
       selectComprehensiveById(data).then((res)=>{
         this.comprehensive = res.list;
-        console.log(this.comprehensive,"123456") 
+        console.log(this.comprehensive,"123456")
+        // var count = -1;
+        // for(var key in this.comprehensive){
+        //   count++;
+        //   console.log(key,this.comprehensive[key])
+        //   for(let i = count;i<this.tableData.length;){
+        //     this.tableData[i].score=this.comprehensive[key]
+        //   }
+        // } 
+        this.tableData[0].score=this.comprehensive.sxzzgn
+        this.tableData[1].score=this.comprehensive.jlgn
+        this.tableData[2].score=this.comprehensive.jcwmxy
+        this.tableData[3].score=this.comprehensive.jtgn
+        this.tableData[4].score=this.comprehensive.xsgybx
+        this.tableData[5].score=this.comprehensive.shsj
+        this.tableData[6].score=this.comprehensive.sixiangfenjf
+        this.tableData[7].score=this.comprehensive.sixiangfenkf
+        this.tableData[8].score=this.comprehensive.sixiangfenxj
+        this.tableData[9].score=this.comprehensive.sixiangfen
+        this.tableData[10].score=this.comprehensive.xxcj
+        this.tableData[11].score=this.comprehensive.xueyefenjf
+        this.tableData[12].score=this.comprehensive.xueyefenkf
+        this.tableData[13].score=this.comprehensive.xyfxiaoji
+        this.tableData[14].score=this.comprehensive.xueyefen
+        this.tableData[15].score=this.comprehensive.tiyuke
+        this.tableData[16].score=this.comprehensive.wthd
+        this.tableData[17].score=this.comprehensive.wentifenjf
+        this.tableData[18].score=this.comprehensive.wentifenkf
+        this.tableData[19].score=this.comprehensive.wentifenxj
+        this.tableData[20].score=this.comprehensive.wentifen
+
+
+        this.getRowSpan()
         this.dialogTableVisible = true;
       })
     },
@@ -435,8 +640,45 @@ export default {
         };
       }
     },
-
+    watchContent(s_id){
+    console.log("查看奖扣分细则，跳转到属于该学生的奖扣分页面")
+    },
+    // 查找
+    handleSearch(){
+      let data={
+      s_name:this.listQuery.name,
+      s_number:this.listQuery.number,
+      s_college:this.listQuery.majorClass,
+      page:this.pageNo,
+      pageSize:this.pageCount
+    }
+    ComprehensiveList(data).then((res)=>{
+      console.log("查询的数据："+res.data)
+      res.data.map(val=>{
+          if(val.s_college){
+          val.s_college=JSON.parse(val.s_college)
+          }
+            // console.log(  val ,'  res.data   res.data ')
+         // this.$set(val,'s_college',JSON.parse(val.s_college))
+          // val.s_college=JSON.parse(val.s_college)
+        })
+ 
+          this.ComprehensiveList = res.data
+          // this.listLoading = false
+      }).catch(error=>{
+          console.log(error);
+    })
+    },
+    // 重置
+    handlerefresh(){
+    this.listQuery.majorClass=[]
+    this.listQuery.name=""
+    this.listQuery.number=""
+    this.getComprehensiveList()
+    this.getPageTotal()
+  }
   },
+ 
 };
 </script>
 

@@ -170,10 +170,13 @@ export default {
     if(hasUserInfo === "undefined"){
       console.log("未填写学生信息")
     }else{
+      const student = JSON.parse(localStorage.getItem('userInfo'))
+      this.healthForm.name=student.s_name,
+      this.healthForm.number=student.s_number,
+      this.healthForm.gender=student.s_gender,
+      this.healthForm.telephone=student.s_telephone
       this.selectHealthById()
     }
-
-
   },
   methods: {
     submitForm() {
@@ -233,6 +236,7 @@ export default {
             type: "success"
           });
           this.reload()
+          // this.show=false
           }else {
             this.$message({
             message: msg,
@@ -260,7 +264,6 @@ export default {
       selectHealthById(data).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
-        var health = res.list
         if(code == 200){
           this.$message({
             message: msg,
@@ -270,12 +273,13 @@ export default {
           this.healthForm.number=health.number,
           this.healthForm.gender=health.gender,
           this.healthForm.telephone=health.telephone,
-          this.healthForm.time=health.time
-          this.healthForm.temperature=health.temperature
-          this.healthForm.ill=health.ill
-          this.healthForm.region=health.region
-          console.log("123456",health.region)
+          this.healthForm.time=res.list.time
+          this.healthForm.temperature=res.list.temperature
+          this.healthForm.ill=res.list.ill
+          this.healthForm.region=res.list.region
+          console.log("123456",res.list.region)
           console.log(TextToCode["河北省"]["秦皇岛市"]["海港区"])
+          this.show=false
         }else{
            this.$message({
             message: msg,

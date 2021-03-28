@@ -377,7 +377,8 @@ export default {
             type: "success"
           });
           console.log("3333333",res.data)
-          // console.log("44444444444",res.data.s_id)
+          // 44444444444 string object
+          console.log("44444444444",typeof list.s_college,typeof JSON.parse(list.s_college))
             this.StudentForm.name = list.s_name,
             this.StudentForm.number = list.s_number,
             this.StudentForm.gender = list.s_gender,
@@ -401,7 +402,11 @@ export default {
     },
     handleChange(value) {
       console.log(value,'dfsd');
-      console.log("zzzz"+this.StudentForm.majorClass)
+      console.log("zzzz"+this.StudentForm.majorClass,Object.prototype.toString.call(this.StudentForm.majorClass));
+      // zzzz信息科学与技术学院,计算机,171 [object Array]
+      var a = JSON.stringify(this.StudentForm.majorClass)
+      // aaaaaa["信息科学与技术学院","计算机","171"] string
+      console.log("aaaaaa"+a,typeof a)
     }
   }
 };

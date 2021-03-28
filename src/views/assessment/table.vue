@@ -157,7 +157,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="11">
-            <el-form-item label="小计(*20%前)" prop="xyfxiaoji">
+            <el-form-item label="小计(*70%前)" prop="xyfxiaoji">
               <el-input
                 v-model="formData.xyfxiaoji"
                 placeholder="请输入分数"
@@ -501,18 +501,19 @@ export default {
         sixiangfenkf:this.formData.sixiangfenkf,
         sixiangfenxj:this.formData.sixiangfenxj,
         sixiangfen:this.formData.sixiangfen,
-        xsgybx:this.formData.xsgybx,
+        xxcj:this.formData.xxcj,
         xueyefenjf:this.formData.xueyefenjf,
         xueyefenkf:this.formData.xueyefenkf,
-        xueyefen:this.formData.xueyefen,
         xyfxiaoji:this.formData.xyfxiaoji,
+        xueyefen:this.formData.xueyefen,
         tiyuke:this.formData.tiyuke,
         wthd:this.formData.wthd,
         wentifenjf:this.formData.wentifenjf,
         wentifenkf:this.formData.wentifenkf,
         wentifenxj:this.formData.wentifenxj,
         wentifen:this.formData.wentifen,
-        studentId:sId
+        studentId:sId,
+        zonghefen:Number(this.formData.sixiangfen+this.formData.xueyefen+this.formData.wentifen)
       };
       submitComprehensive(data).then((res)=>{
         var code = res.statusCode
@@ -550,7 +551,7 @@ export default {
         sixiangfenkf:this.formData.sixiangfenkf,
         sixiangfenxj:this.formData.sixiangfenxj,
         sixiangfen:this.formData.sixiangfen,
-        xsgybx:this.formData.xsgybx,
+        xxcj:this.formData.xxcj,
         xueyefenjf:this.formData.xueyefenjf,
         xueyefenkf:this.formData.xueyefenkf,
         xueyefen:this.formData.xueyefen,
@@ -561,7 +562,8 @@ export default {
         wentifenkf:this.formData.wentifenkf,
         wentifenxj:this.formData.wentifenxj,
         wentifen:this.formData.wentifen,
-        studentId:studentId
+        studentId:studentId,
+        zonghefen:Number(this.formData.sixiangfen+this.formData.xueyefen+this.formData.wentifen)
       };
       updateComprehensive(data).then((res)=>{
         var code = res.statusCode
@@ -611,7 +613,7 @@ export default {
             this.formData.sixiangfenkf = Comprehensive.sixiangfenkf,
             this.formData.sixiangfenxj = Comprehensive.sixiangfenxj,
             this.formData.sixiangfen = Comprehensive.sixiangfen,
-            this.formData.xsgybx = Comprehensive.xsgybx,
+            this.formData.xxcj = Comprehensive.xxcj,
             this.formData.xueyefenjf = Comprehensive.xueyefenjf,
             this.formData.xueyefenkf = Comprehensive.xueyefenkf,
             this.formData.xueyefen = Comprehensive.xueyefen,
