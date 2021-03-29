@@ -27,5 +27,14 @@ export function searchProof(params) {
   }
 
 
+  //修改信息
+export function updateProof(data) {
+  return request({
+    url: '/updateProof',
+    method: 'post',
+    data
+  })
+}
+
 
     

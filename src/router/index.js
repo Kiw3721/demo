@@ -209,21 +209,6 @@ export const asyncRoutes = [
     }]
   },
   {
-    path: '/rewards-table',
-    component: Layout,
-    meta: {roles: ['1']},
-    children: [{
-      path: 'rewards-table',
-      name: 'rewards-table',
-      component: () => import('@/views/teacher/rewards-table'),
-      meta: {
-        title: '奖扣分表格详情',
-        icon: 'form',
-        roles: ['1']
-      }
-    }]
-  },
-  {
     path: '/apply-table',
     component: Layout,
     meta: {roles: ['1']},

@@ -25,3 +25,12 @@ export function updateHealth(data) {
       params
     })
   }
+
+    //查询信息
+    export function healthList(params) {
+      return request({
+        url: '/healthList',
+        method: 'get',
+        params
+      })
+    }

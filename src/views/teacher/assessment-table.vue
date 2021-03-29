@@ -70,9 +70,8 @@
       </el-button>
     </div>
 
-<!-- v-loading="listLoading" -->
     <el-table
-      
+      v-loading="listLoading"
       :data="ComprehensiveList"
       border
       fit
@@ -119,7 +118,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="班级" prop="s_grade" width="80px" align="center">
+      <el-table-column label="班级" prop="s_class" width="80px" align="center">
         <template slot-scope="{row}">
             <span>{{row.s_college?row.s_college[2]:'' }}</span>
         </template>
@@ -185,11 +184,6 @@
         width="230"
         class-name="small-padding fixed-width"
       >
-      <!-- <template >
-          <el-button type="primary" size="mini" >
-            
-          </el-button>
-        </template> -->
         <template slot-scope="{ row }">
           <el-button type="primary" size="mini" v-if="row.state==null" @click.native="state(row)"> 未审核 </el-button>
           <el-button type="primary" size="mini" v-if="row.state==1"> 通过审核 </el-button> 
@@ -207,6 +201,7 @@
   </el-pagination>
      </div>
 
+<!-- 学生自评表 -->
     <el-dialog title="学生自评分数详情" :visible.sync="dialogTableVisible">
       <el-table
         :data="tableData"
@@ -238,12 +233,47 @@
         <el-button type="primary" @click="stateok(2)">拒绝</el-button>
   </div>
 </el-dialog>
+
+
+<!-- 奖扣分细则弹窗 -->
+<el-dialog title="奖扣分细则" :visible.sync="dialogTableVisible1">
+  <el-table :data="tableData1" style="margin:10px 0">
+    <el-table-column prop="activityType" label="活动类型" width="100"></el-table-column>
+    <el-table-column prop="activityName" label="活动名称" width="200"></el-table-column>
+    <el-table-column prop="activityNum" label="分数" width="80"></el-table-column>
+    <el-table-column prop="activityProofPic" label="图片证明" width="150">
+      <template slot-scope="{row}"  >
+            <a @click="Proofshow(row.activityProofPath)">
+              {{row.activityProofPic}}
+            </a>
+          </template>
+    </el-table-column>
+  </el-table>
+  <el-form >
+    <el-form-item label="审核备注：" label-width="120px">
+      <el-input v-model="beizhu1" ></el-input>
+    </el-form-item> 
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogTableVisible1 = false">取 消</el-button>
+    <el-button type="primary" @click.native="statejk(1)">通过</el-button>
+    <el-button type="primary" @click.native="statejk(2)">拒绝</el-button>
   </div>
+</el-dialog>
+
+    <!-- 图片预览窗口 -->
+    <el-dialog title="图片预览" :visible.sync="previewVisiblePic" width="80%">
+      <img :src="previewPath" class="previewImg" />
+    </el-dialog>
+
+  </div>
+
 </template>
 
 <script>
 import { selectComprehensiveById,updateComprehensive,ComprehensiveList} from '@/api/comprehensive'
 // import { getAllStudent ,StudentList} from '@/api/student'
+import { searchProof,updateProof} from "@/api/activityProof";
 
 export default {
   name: "ComplexTable",
@@ -257,6 +287,7 @@ export default {
         number:""
       },
       beizhu:null,//审批备注
+      beizhu1:null, //奖扣分备注
       ComprehensiveList: [],
       options: [
         {
@@ -379,6 +410,10 @@ export default {
       // collageOptions: ["信科院", "管院", "艺设"],
       // classOptions: ["计算机171", "信管171", "物联网182"],
       dialogTableVisible: false,
+      dialogTableVisible1:false,
+      previewVisiblePic:false,
+       //图片地址
+      previewPath: "",
       tableData: [
         {
           content: "思想分",
@@ -540,6 +575,8 @@ export default {
       totalPage:1,//总页码
       studentlist:{},//学生详情
       dialogFormVisible:false,
+      tableData1:[], //奖扣分细则
+      studentId:''
     };
   },
   created() {
@@ -667,11 +704,38 @@ export default {
         };
       }
     },
+    // 奖扣分弹窗获取数据
     watchContent(s_id){
-    console.log("查看奖扣分细则，跳转到属于该学生的奖扣分页面")
+      console.log("查看奖扣分细则，跳转到属于该学生的奖扣分页面")
+      this.searchProofById(s_id)
+    },
+    searchProofById(studentId){
+      let data = {studentId:studentId}
+      searchProof(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        if( code == 200) { 
+           this.$message({
+            message: msg,
+            type: "success"
+          });
+          this.tableData1 = res.data
+          this.studentId = studentId
+          console.log("1111",studentId,"2222",this.studentId)
+          this.dialogTableVisible1 = true;
+          }else{
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("获取失败！"+msg);
+            return false;
+          }
+      })
     },
     // 查找
     handleSearch(){
+      this.listLoading = true
       let data={
       s_name:this.listQuery.name,
       s_number:this.listQuery.number,
@@ -691,7 +755,7 @@ export default {
         })
  
           this.ComprehensiveList = res.data
-          // this.listLoading = false
+          this.listLoading = false
       }).catch(error=>{
           console.log(error);
     })
@@ -704,6 +768,15 @@ export default {
     this.getComprehensiveList()
     this.getPageTotal()
   },
+  state(v){
+ //   const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
+    //  this.$set(v,'studentId',v.s_id) 
+    //    this.$set(v,'s_college',JSON.stringify(v.s_college)) 
+    //  this.$set(v,'state',1)
+    this.studentlist=v
+    this.dialogFormVisible=true
+  },
+  // 综合测评状态
   stateok(sum){
       let data ={
       studentId:this.studentlist.s_id,
@@ -732,18 +805,41 @@ export default {
       })
   
   },
-  state(v){
- //   const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
-    //  this.$set(v,'studentId',v.s_id) 
-    //    this.$set(v,'s_college',JSON.stringify(v.s_college)) 
-    //  this.$set(v,'state',1)
-    this.studentlist=v
-    this.dialogFormVisible=true
-
-
+  
+  // 预览奖扣分
+  Proofshow(path){
+      console.log("1111"+path)
+      this.previewVisiblePic = true;
+      this.previewPath = "http://localhost:3000/"+path;
+    },
+    statejk(num){
+    console.log("状态："+num)
+    let data ={
+      studentId:this.studentId,
+      state:num,
+      beizhu:this.beizhu1,
+    }
+    updateProof(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        if( code == 200) {
+         this.$message({
+            message: msg,
+            type: "success"
+          });
+          this.dialogFormVisible=false
+          this.reload()
+          }else {
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("修改失败！"+msg);
+          }
+      })
   }
   },
- 
+  
 };
 </script>
 
@@ -762,5 +858,9 @@ export default {
   text-align:center;
   margin-top:10px;
  
+}
+.previewImg{
+  width: 100%;
+  height: 100%;
 }
 </style>

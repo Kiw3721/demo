@@ -51,6 +51,7 @@
           type="datetime"
           placeholder="选择日期时间"
           default-time="12:00:00"
+          value-format="timestamp"
         >
         </el-date-picker>
       </el-form-item>
@@ -252,6 +253,7 @@ export default {
     handleChange() {
       var loc = "";
       for (let i = 0; i < this.healthForm.region.length; i++) {
+        console.log("在哪",this.healthForm.region)
         loc += CodeToText[this.healthForm.region[i]];
       }
       console.log(loc)
@@ -269,14 +271,7 @@ export default {
             message: msg,
             type: "success"
           });
-          this.healthForm.name=health.name,
-          this.healthForm.number=health.number,
-          this.healthForm.gender=health.gender,
-          this.healthForm.telephone=health.telephone,
-          this.healthForm.time=res.list.time
-          this.healthForm.temperature=res.list.temperature
-          this.healthForm.ill=res.list.ill
-          this.healthForm.region=res.list.region
+          this.healthForm = res.list
           console.log("123456",res.list.region)
           console.log(TextToCode["河北省"]["秦皇岛市"]["海港区"])
           this.show=false

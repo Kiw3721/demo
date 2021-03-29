@@ -120,7 +120,7 @@
     </table>
 
     <!-- 图片预览窗口 -->
-    <el-dialog title="图片预览" :visible.sync="previewVisible" width="50%">
+    <el-dialog title="图片预览" :visible.sync="previewVisible" width="80%">
       <img :src="previewPath" class="previewImg" />
     </el-dialog>
 
@@ -157,9 +157,9 @@
       width="30%"
       :modal-append-to-body="false"
     >
-      <span>审核状态：{{status}}</span>
+      <span>审核状态：{{this.myData[0].state==null?"未审核":this.myData[0].state==1?"审核通过":"审核未通过"}}</span>
       <br>
-      <span>反馈信息：{{message}}</span>
+      <span>反馈信息：{{this.myData[0].beizhu}}</span>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
       </span>
@@ -196,8 +196,6 @@ export default {
           label: '文体分'
         }],
       title:"审核结果",
-      status:"未审核",
-      message:"无",
       dialogVisible:false,
     };
   },

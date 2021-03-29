@@ -25,3 +25,13 @@ export function searchApplyById(params) {
     params
   })
 }
+
+
+//查询信息
+  export function ApplyList(params) {
+    return request({
+      url: '/ApplyList',
+      method: 'get',
+      params
+    })
+  }

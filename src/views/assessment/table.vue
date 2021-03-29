@@ -269,8 +269,8 @@
       width="30%"
       :modal-append-to-body="false"
     >
-      <span>审核状态：{{this.formData.state==null?'未审核':this.formData.state==1?'通过':'未通过'}}</span>
-      <span>反馈信息：{{this.formData.beizhu}}</span>
+      <span class="shenhe">审核状态：{{this.formData.state==null?'未审核':this.formData.state==1?'通过':'未通过'}}</span>
+      <span class="shenhe">反馈信息：{{this.formData.beizhu}}</span>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
       </span>
@@ -313,8 +313,6 @@ export default {
         wentifen: '',
       },
       title:"审核结果",
-      status:"未审核",
-      message:"无",
       dialogVisible:false,
       
       rules: {
@@ -537,9 +535,6 @@ export default {
       })
       
     },
-    resetForm() {
-      this.$refs["formData"].resetFields();
-    },
     updateForm(){
       const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
       let data = {
@@ -603,33 +598,6 @@ export default {
             type: "success"
           });
           this.formData = res.list
-
-          // if(Comprehensive.length == 0){
-          //   this.show=true
-          // }else{
-          //   this.show=false
-          //   this.formData.sxzzgn = Comprehensive.sxzzgn,
-          //   this.formData.jlgn = Comprehensive.jlgn,
-          //   this.formData.jcwmxy = Comprehensive.jcwmxy,
-          //   this.formData.jtgn = Comprehensive.jtgn,
-          //   this.formData.xsgybx = Comprehensive.xsgybx,
-          //   this.formData.shsj= Comprehensive.shsj,
-          //   this.formData.sixiangfenjf=Comprehensive.sixiangfenjf,
-          //   this.formData.sixiangfenkf = Comprehensive.sixiangfenkf,
-          //   this.formData.sixiangfenxj = Comprehensive.sixiangfenxj,
-          //   this.formData.sixiangfen = Comprehensive.sixiangfen,
-          //   this.formData.xxcj = Comprehensive.xxcj,
-          //   this.formData.xueyefenjf = Comprehensive.xueyefenjf,
-          //   this.formData.xueyefenkf = Comprehensive.xueyefenkf,
-          //   this.formData.xueyefen = Comprehensive.xueyefen,
-          //   this.formData.xyfxiaoji = Comprehensive.xyfxiaoji,
-          //   this.formData.tiyuke = Comprehensive.tiyuke,
-          //   this.formData.wthd = Comprehensive.wthd,
-          //   this.formData.wentifenjf = Comprehensive.wentifenjf,
-          //   this.formData.wentifenkf = Comprehensive.wentifenkf,
-          //   this.formData.wentifenxj = Comprehensive.wentifenxj,
-          //   this.formData.wentifen = Comprehensive.wentifen
-          // }
         }else{
           this.$message({
             message: msg,
@@ -675,5 +643,10 @@ span {
 
 .item {
   margin-left: 20px;
+}
+
+.shenhe{
+  font-size: 16px;
+  text-align: left;
 }
 </style>

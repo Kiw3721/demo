@@ -178,6 +178,9 @@
       </el-form-item>
 
       <el-form-item label="附件：">
+        <el-input v-model="applyForm.fujianName" placeholder="请上传附件" >
+          <el-button slot="append" icon="el-icon-download" @click.native="download"></el-button>
+        </el-input>
         <el-tooltip
           class="item"
           effect="dark"
@@ -187,6 +190,10 @@
           <el-upload
             class="upload"
             action="/uploads/"
+            :on-exceed="handleExceed"
+            :on-remove="handleRemove"
+            :before-remove="beforeRemove"
+            :on-success="handleSuccess"
             multiple
             :file-list="fileList"
             :limit="1"
@@ -227,9 +234,9 @@
       width="30%"
       :modal-append-to-body="false"
     >
-      <span>审核状态：{{status}}</span>
+      <span class="shenhe">审核状态：{{this.applyForm.state==null?'未审核':this.applyForm.state==1?'审核通过':'审核未通过'}}</span>
       <br>
-      <span>反馈信息：{{message}}</span>
+      <span class="shenhe">反馈信息：{{this.applyForm.beizhu}}</span>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
       </span>
@@ -241,9 +248,11 @@
 <script>
 import {getCardTypeNumber} from "../../utils/validate"
 import { addApply,updateApply,searchApplyById} from "@/api/apply";
+import { deleteFiles,downloadFile} from "@/api/files";
 
 export default {
   name: "Apply",
+  inject:['reload'],
   props: {},
   data() {
     var checkNumber = (rule, value, callback) => {
@@ -290,7 +299,9 @@ export default {
         workPerson: "",
         familyPerson: "",
         studyPerson: "",
-        yearInput: ""
+        yearInput: "",
+        fujian:'',
+        fujianName:''
       },
       fileList: [],
       options: [
@@ -450,8 +461,6 @@ export default {
       },
       show:true,
       title:"审核结果",
-      status:"未审核",
-      message:"无",
       dialogVisible:false,
     };
   },
@@ -468,9 +477,7 @@ export default {
       this.applyForm.idCard = hasUserInfo.s_idCard,
       this.applyForm.region = hasUserInfo.s_address,
       this.applyForm.telephone = hasUserInfo.s_telephone
-      if(!this.show){
-        this.searchApplyById()
-      }
+      this.searchApplyById()
       
     }
   },
@@ -480,10 +487,13 @@ export default {
   methods: {
     submitForm() {
       const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      const wenjian = JSON.parse(localStorage.getItem("wenjian"));
       console.log("biadao=fcas",this.applyForm,studentId)
       this.applyForm["studentId"]=studentId
-      this.applyForm["majorClass"]=JSON.stringify(this.applyForm.majorClass),
-      console.log("biadao=fcas",this.applyForm)
+      this.applyForm.fujian=wenjian.path
+      this.applyForm.fujianName=wenjian.name
+      // this.applyForm["majorClass"]=this.applyForm.majorClass,
+      console.log("biadao111111",this.applyForm)
     addApply(this.applyForm).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
@@ -505,9 +515,12 @@ export default {
     },
     updateForm(){
       const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
+      const wenjian = JSON.parse(localStorage.getItem("wenjian"));
       this.applyForm["studentId"]=studentId
+      this.applyForm.fujian=wenjian.path
+      this.applyForm.fujianName=wenjian.name
       this.applyForm["majorClass"]=JSON.stringify(this.applyForm.majorClass),
-      console.log("biadao=fcas",this.applyForm)
+      console.log("biadao22222",this.applyForm)
       updateApply(this.applyForm).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
@@ -516,7 +529,7 @@ export default {
             message: msg,
             type: "success"
           });
-          this.applyForm.majorClass = JSON.parse(res.data.majorClass)
+          this.reload()
           }else {
             this.$message({
             message: msg,
@@ -538,9 +551,10 @@ export default {
             message: msg,
             type: "success"
           });
+          this.show = false
           this.applyForm = res.data
           this.applyForm.majorClass = JSON.parse(res.data.majorClass)
-          this.show = false
+          // this.applyForm.fujianName = res.data.fujianName
           }else{
             this.$message({
             message: msg,
@@ -551,12 +565,65 @@ export default {
           }
       })
     },
-    // resetForm(formName) {
-    //   this.$refs[formName].resetFields();
-    // },
     handleChange(value) {
       console.log(value,'dfsd');
       console.log("zzzz"+this.applyForm.majorClass)
+    },
+    // 文件限制判断
+     handleExceed(files, fileList) {
+      this.$message.warning(`只能上传一个压缩包文件`);
+    },
+    // 移除判断
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+    // 移除文件
+    handleRemove(file, fileList) {
+      console.log("11111111", file, fileList);
+      console.log("2222",file.path)
+      this.deleteFile(file.path)
+    },
+    // 删除图片接口
+    deleteFile(path){
+      console.log(path,"zzzzz")
+      let data ={
+        path:path
+      }
+      deleteFiles(data).then((res)=>{
+        var code = res.statusCode;
+        var msg = res.msg;
+        if (code == 200) {
+            this.$message({
+              message: msg,
+              type: "success",
+            });
+            this.applyForm.fujianName = ''
+          } 
+      })
+    },
+    //监听图片上传成功
+    handleSuccess(response) {
+      //拼接得到图片信息对象
+      console.log("chenggong",response)
+      const wenjian = { name: response.data.name, path: response.data.path2 };
+      //将文件信息存入浏览器localStorage
+      localStorage.setItem("wenjian", JSON.stringify(wenjian));
+      console.log("图片信息：" + wenjian);
+      this.applyForm.fujianName = response.data.name
+      //将图片信息对象，push到pics数组中
+      this.fileList.push(wenjian);
+      console.log("图片信息：" + this.fileList);
+    },
+    // 下载文件
+    download(){
+      const wenjian = JSON.parse(localStorage.getItem("wenjian"));
+      let data ={
+        url:wenjian.path,
+        filename:wenjian.name
+      }
+      downloadFile(data).then((res)=>{
+        console.log("下载")
+      })
     }
   }
 };
