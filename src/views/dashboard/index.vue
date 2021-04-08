@@ -89,7 +89,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import {getCardTypeNumber} from "../../utils/validate"
+// import {getCardTypeNumber} from "../../utils/validate"
 import { addStudent,updateStudent,getStudentById} from "@/api/student";
 
 // 手机号验证
@@ -107,6 +107,7 @@ function isvalidPhone(str) {
           callback()
       }
   }
+
 
 export default {
   name: "Dashboard",
@@ -145,8 +146,12 @@ export default {
         ],
         phone: [{ required: true, validator: validPhone, trigger: "blur" }],
          idCard: [
-           { required: true, message: '必填项', trigger: 'blur' },
-         { validator: getCardTypeNumber, trigger: 'blur' }
+           { required: true, message: '请填写证件号码', trigger: 'blur' },
+          {
+            pattern: /(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)|(^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$)/,
+            message: '证件号码格式有误！',
+            trigger: 'blur'
+          }
          ],
          address:[{ required: true, message: "请输入家庭住址", trigger: "blur" }],
       },

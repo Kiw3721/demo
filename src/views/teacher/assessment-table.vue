@@ -66,8 +66,10 @@
         icon="el-icon-refresh"
         @click="handlerefresh"
       >
-        重置
+        刷新
       </el-button>
+
+      
     </div>
 
     <el-table
@@ -144,6 +146,13 @@
         </template>
       </el-table-column>
 
+       <el-table-column label="排名" prop="rowno" width="120px" align="center">
+        <template slot-scope="{row}">
+            <span>{{row.rowno}}</span>
+        </template>
+      </el-table-column>
+
+
       <el-table-column label="学生自评" width="150px" align="center">
         <template slot-scope="{ row }">
           <el-button type="primary" size="mini" @click.native="watchStudent(row.s_id)">
@@ -160,21 +169,14 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="等级" width="400px" align="center">
-        <template slot-scope="scope">
-  
-          <el-button type="info" size="mini" v-show="scope.$index<=9" >
-            一等奖
+      <el-table-column label="等级" width="200px" align="center">
+        <template slot-scope="{row}">
+          <el-button type="text" size="mini">
+
+           {{row.dengji?row.dengji:dengji}}
+
           </el-button>
-          <el-button type="info" size="mini" v-show="scope.$index>9&&scope.$index<=19">
-            二等奖
-          </el-button>
-          <el-button type="info" size="mini" v-show="scope.$index>19&&scope.$index<=29" >
-            三等奖
-          </el-button>
-          <el-button type="info" size="mini" v-show="scope.$index>29" >
-            无
-          </el-button>
+          <el-button icon="el-icon-edit" size="mini" round @click.native="updateLevel(row)"></el-button>
         </template>
       </el-table-column>
 
@@ -186,8 +188,8 @@
       >
         <template slot-scope="{ row }">
           <el-button type="primary" size="mini" v-if="row.state==null" @click.native="state(row)"> 未审核 </el-button>
-          <el-button type="primary" size="mini" v-if="row.state==1"> 通过审核 </el-button> 
-          <el-button type="primary" size="mini" v-if="row.state==2"> 拒绝通过 </el-button> 
+          <el-button type="primary" size="mini" v-if="row.state==1" @click.native="state(row)"> 通过审核 </el-button> 
+          <el-button type="primary" size="mini" v-if="row.state==2" @click.native="state(row)"> 拒绝通过 </el-button> 
        </template>
       </el-table-column>
     </el-table>
@@ -271,7 +273,7 @@
 </template>
 
 <script>
-import { selectComprehensiveById,updateComprehensive,ComprehensiveList} from '@/api/comprehensive'
+import { selectComprehensiveById,updateComprehensive,ComprehensiveList,selectComprehensive} from '@/api/comprehensive'
 // import { getAllStudent ,StudentList} from '@/api/student'
 import { searchProof,updateProof} from "@/api/activityProof";
 
@@ -289,6 +291,7 @@ export default {
       beizhu:null,//审批备注
       beizhu1:null, //奖扣分备注
       ComprehensiveList: [],
+      dengji:"无",
       options: [
         {
           value: "信息科学与技术学院",
@@ -600,7 +603,6 @@ export default {
           val.s_college=JSON.parse(val.s_college)
           }
         })
- 
           this.ComprehensiveList = res.data
           this.listLoading = false
       }).catch(error=>{
@@ -633,6 +635,7 @@ export default {
       // this.dialogTableVisible = true;
       this.selectComprehensive(s_id)
     },
+    // 查找学生自评的分数
     selectComprehensive(studentId){
       let data = {studentId:studentId}
       selectComprehensiveById(data).then((res)=>{
@@ -709,6 +712,7 @@ export default {
       console.log("查看奖扣分细则，跳转到属于该学生的奖扣分页面")
       this.searchProofById(s_id)
     },
+    // 查找学生奖扣分详情
     searchProofById(studentId){
       let data = {studentId:studentId}
       searchProof(data).then((res)=>{
@@ -739,11 +743,11 @@ export default {
       let data={
       s_name:this.listQuery.name,
       s_number:this.listQuery.number,
-      s_college:this.listQuery.majorClass,
+      s_college:JSON.stringify(this.listQuery.majorClass),
       page:this.pageNo,
       pageSize:this.pageCount
     }
-    ComprehensiveList(data).then((res)=>{
+    selectComprehensive(data).then((res)=>{
       console.log("查询的数据："+res.data)
       res.data.map(val=>{
           if(val.s_college){
@@ -837,6 +841,10 @@ export default {
             console.log("修改失败！"+msg);
           }
       })
+  },
+  // 修改等级
+  updateLevel(v){
+    this.dialogFormVisible=true
   }
   },
   

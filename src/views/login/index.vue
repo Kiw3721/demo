@@ -46,14 +46,42 @@
       <el-button :loading="loading" type="goon" style="width:100%;margin-bottom:15px;" @click.native.prevent="handleLogin">登录</el-button>
 
       <div class="tips">
+        <el-button type="text" style="color:#101b20;font-size:16px;" @click="dialogFormVisible = true">忘记密码</el-button>
         <el-button type="text" style="color:#101b20;font-size:16px;" @click="Register">立即注册</el-button>
       </div>
 
     </el-form>
+
+    <el-dialog title="修改密码" :visible.sync="dialogFormVisible" :append-to-body="true">
+  <el-form :model="PasswordForm" :rules="passwordRules" :label-width="100">
+    <el-form-item label="账号："  prop="account">
+      <el-input v-model="PasswordForm.account" autocomplete="off" placeholder="请输入账号" type="text"></el-input>
+    </el-form-item>
+    <el-form-item label="新密码"  prop="newPassword">
+      <el-input v-model="PasswordForm.newPassword" type="password" placeholder="请再输入一次新的密码" autocomplete="off"></el-input>
+    </el-form-item>
+    <el-form-item label="确定新密码" prop="cNewPassword">
+      <el-input v-model="PasswordForm.cNewPassword"  type="password" placeholder="请再输入一次新的密码" autocomplete="off"></el-input>
+    </el-form-item>
+    <el-form-item label="所属角色" prop="role">
+        <el-radio-group v-model="PasswordForm.roles">
+          <el-radio label="0">学生</el-radio>
+          <el-radio label="1">老师</el-radio>
+        </el-radio-group>
+      </el-form-item>
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogFormVisible = false">取 消</el-button>
+    <el-button type="primary" @click="changePassword">确 定</el-button>
+  </div>
+</el-dialog>
+
   </div>
 </template>
 
 <script>
+import { changePassword } from "@/api/login";
+
 export default {
   name: 'Login',
   data() {
@@ -61,14 +89,35 @@ export default {
        if (!value) {
         return callback(new Error("账号不能为空"));
       }
-    }
+    };
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
         callback(new Error('密码不能少于6位数'))
       } else {
         callback()
       }
-    }
+    };
+    const validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入新的密码"));
+      } else if(value.length < 6){
+        callback(new Error('密码不能少于6位数'))
+      }else{
+        if (this.PasswordForm.newPassword !== "") {
+          this.$refs.PasswordForm.validateField("cNewPassword");
+        }
+        callback();
+      }    
+    };
+    const validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入新的密码"));
+      } else if (value !== this.PasswordForm.newPassword) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
     return {
       loginForm: {
         account: "",
@@ -80,7 +129,20 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      dialogFormVisible: false,
+      PasswordForm:{
+        account: "",
+        newPassword:"",
+        cNewPassword:"",
+        roles: "0",
+      },
+      passwordRules: {
+        account: [{ type:'string',required: true, trigger: 'blur', validator: validateAccount }],
+        newPassword: [{ type:'string' , required: true, trigger: 'blur', validator: validatePass }],
+        cNewPassword: [{ type:'string' , required: true, trigger: 'blur', validator: validatePass2 }],
+        roles: [{ required: true, message: "请选择角色", trigger: "change" },],
+      },
     }
   },
   watch: {
@@ -104,19 +166,6 @@ export default {
     },
     handleLogin() {
       this.loading = true
-      // console.log("返回的数据：1")
-      // login(this.loginForm).then((res) => {
-      //   // const { data } = response
-      //   this.loading = false
-      //   console.log("返回的数据：2",res)
-      //   // 设置 token，作为用户已登陆的前端标识，存在 cookie 中
-      //   // commit('SET_TOKEN', data.token)
-      //   // setToken() 方法会把 token 保存到 cookie 里
-      //   // setToken(data.token)
-      //
-      // }).catch(error => {
-      //
-      // })
       this.$store.dispatch('user/login', this.loginForm).then((res) => {
             let roles = res.roles;
             this.$router.push({ path:'/' })
@@ -125,13 +174,31 @@ export default {
             this.loading = false
             this.$message({
               type:'error',
-              message:errorMsg
+              message:"登录失败，账号或密码错误"
             })
           })
     },
     Register() {
       console.log('注册路由')
       this.$router.push({ path: '/register' })
+    },
+    changePassword(){
+      changePassword(this.PasswordForm).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        if(code == 200) { 
+          this.$message({
+            message: msg,
+            type: "success"
+          });
+          this.dialogFormVisible = false
+          }else {
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+          }
+        })
     }
   }
 }

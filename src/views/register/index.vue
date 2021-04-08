@@ -114,7 +114,7 @@ export default {
         cpassword: [{ validator: validatePass2, trigger: "blur" }],
         account: [{ validator: checkAccount, trigger: "blur" }],
         roles: [
-          { required: true, message: "请选择活动资源", trigger: "change" },
+          { required: true, message: "请选择角色", trigger: "change" },
         ],
       },
       title:'',

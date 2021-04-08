@@ -104,6 +104,7 @@
                 clearable
                 :style="{ width: '100%' }"
               ></el-input>
+              <!-- {{sixiangfenxj}} -->
             </el-form-item>
           </el-col>
           <el-col :span="11">
@@ -281,6 +282,7 @@
 
 <script>
 import { submitComprehensive ,updateComprehensive,selectComprehensiveById} from "@/api/comprehensive";
+import { parse } from 'path-to-regexp';
 
 
 export default {
@@ -468,18 +470,14 @@ export default {
     };
   },
   computed: {
-    
+    sixiangfenxj(){
+      console.log("小计")
+      this.formData.sixiangfenxj = parseInt(this.formData.sxzzgn+this.formData.jlgn)
+    }
   },
   watch: {},
   created() {
-    const hasUserInfo = localStorage.getItem('userInfo')
-    console.log("aaaaaa"+ hasUserInfo);  //string
-    if(hasUserInfo === "undefined"){
-      console.log("未填写个人信息")
-    }else{
-      this.show = false
-      this.selectComprehensiveById()
-    }
+    this.selectComprehensiveById()
   },
   mounted() {},
   methods: {
@@ -589,15 +587,21 @@ export default {
       selectComprehensiveById(data).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
-        // var Comprehensive = res.list
-        // this.formData = res.list
-        // console.log()
+        var data = res.list
         if(code == 200){
-          this.$message({
+          if(data.length ==0){
+            this.$message({
+            message: msg,
+            type: "success"
+          });
+          }else{
+            this.$message({
             message: msg,
             type: "success"
           });
           this.formData = res.list
+          this.show = false
+          }
         }else{
           this.$message({
             message: msg,

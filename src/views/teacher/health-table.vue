@@ -88,7 +88,7 @@
         </template>
       </el-table-column>
 
-       <el-table-column label="填报时间" prop="time" width="200px" align="center">
+       <el-table-column label="填报时间" prop="time" width="200px" align="center" :formatter="formatDate">
         <template slot-scope="{row}">
             <span>{{ row.time }}</span>
         </template>
@@ -130,6 +130,7 @@
 
 <script>
 import { healthList } from '@/api/health'
+import { CodeToText} from "element-china-area-data";
 
 export default {
   name: "health",
@@ -184,9 +185,13 @@ export default {
         this.listLoading = true
          healthList().then((res)=>{
               console.log("msgggg"+res.msg)
-              this.allData = res.list;
-              this.totalPage = Math.ceil(this.allData.length / this.pageCount) * 10;
-              console.log("获取总页数"+this.totalPage);
+              this.allData = res.data;             
+              if(this.allData){
+                console.log("chandu"+this.allData.length)
+                this.totalPage = Math.ceil(this.allData.length / this.pageCount) * 10;
+                console.log("获取总页数"+this.totalPage);
+                this.handleChange()
+              }
               this.listLoading = false
           }).catch(error=>{
             console.log(error)
@@ -214,8 +219,29 @@ export default {
     this.listQuery.number=""
     this.getHealthList()
     this.getPageTotal();
-  }
-
+  },
+   handleChange() {
+    //  for(let i =0;i<this.allData.length;i++){
+    //     console.log(this.allData[i].region,"!2321321")
+    //  }
+    //  console.log(JSON.parse(this.allData[4].region),"aaaaa")
+     var region = JSON.parse(this.allData[4].region)
+     console.log(region,"aaaaa")
+      var loc = "";
+      for (let i = 0; i < region.length; i++) {
+        loc += CodeToText[region[i]];
+      }
+      console.log(loc)
+    },
+    formatDate(row, column) {
+          // 获取单元格数据
+          let data = row[column.property]
+          if(data == null) {
+              return null
+          }
+          let dt = new Date(data)
+          return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds()
+        },
   }
 };
 </script>

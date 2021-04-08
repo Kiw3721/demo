@@ -26,10 +26,21 @@ export function selectComprehensiveById(params) {
   })
 }
 
-  //查询信息
+  //分页查询
   export function ComprehensiveList(params) {
     return request({
       url: '/ComprehensiveList',
+      method: 'get',
+      params
+    })
+  }
+
+
+  
+  //条件查询
+  export function selectComprehensive(params) {
+    return request({
+      url: '/selectComprehensive',
       method: 'get',
       params
     })

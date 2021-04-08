@@ -50,8 +50,9 @@
           v-model="healthForm.time"
           type="datetime"
           placeholder="选择日期时间"
+          format="yyyy-MM-dd HH:mm"
           default-time="12:00:00"
-          value-format="timestamp"
+          value-format="yyyy-MM-dd HH:mm"
         >
         </el-date-picker>
       </el-form-item>
@@ -102,7 +103,7 @@
 </template>
 
 <script>
-import { regionData, CodeToText,TextToCode } from "element-china-area-data";
+import { regionData, CodeToText} from "element-china-area-data";
 import { addHealth ,updateHealth,selectHealthById} from "@/api/health";
 
 export default {
@@ -171,6 +172,7 @@ export default {
     if(hasUserInfo === "undefined"){
       console.log("未填写学生信息")
     }else{
+      this.show=false
       const student = JSON.parse(localStorage.getItem('userInfo'))
       this.healthForm.name=student.s_name,
       this.healthForm.number=student.s_number,
@@ -181,6 +183,7 @@ export default {
   },
   methods: {
     submitForm() {
+      console.log("111111"+this.healthForm.time)
       console.log("111111"+this.healthForm.region)
       const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
       console.log("12345"+studentId);
@@ -226,8 +229,9 @@ export default {
         time:this.healthForm.time,
         temperature:this.healthForm.temperature,
         ill: this.healthForm.ill,
-        region: this.local
+        region: JSON.stringify(this.healthForm.region)
       }
+      console.log("12321321",this.healthForm.time)
       updateHealth(data).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
@@ -272,8 +276,9 @@ export default {
             type: "success"
           });
           this.healthForm = res.list
-          console.log("123456",res.list.region)
-          console.log(TextToCode["河北省"]["秦皇岛市"]["海港区"])
+          this.healthForm.region = JSON.parse(res.list.region)
+          console.log("123456",res.list.region,"111111",res.list.time)
+          // console.log(TextToCode["河北省"]["秦皇岛市"]["海港区"])
           this.show=false
         }else{
            this.$message({

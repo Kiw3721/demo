@@ -47,13 +47,8 @@ const actions = {
     } = Info
     console.log("信息" + JSON.stringify(Info))
     return new Promise((resolve, reject) => {
-      login({
-        account: account,
-        password: password
-      }).then(response => {
-        const {
-          data
-        } = response
+      login({account: account,password: password}).then(response => {
+        const {data} = response
         console.log(response, "返回的数据：" + data)
         // 设置 token，作为用户已登陆的前端标识，存在 cookie 中
         // commit('SET_TOKEN', data.token)
@@ -71,7 +66,7 @@ const actions = {
         localStorage.setItem("Comprehensive", JSON.stringify(response.Comprehensive));
         resolve(response)
       }).catch(error => {
-        reject(error)
+        reject("错误"+error)
       })
     })
   },

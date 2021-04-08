@@ -143,7 +143,7 @@
           <el-option label="父母双方均没有工作" value="父母双方均没有工作" />
         </el-select>
       </el-form-item>
-      <el-form-item label="父母从业情况：" prop="culture">
+      <el-form-item label="父母文化：" prop="culture">
         <el-select v-model="applyForm.culture" placeholder="请选择">
           <el-option label="父母均为初中及以下文化程度" value="父母均为初中及以下文化程度" />
           <el-option label="父母一方为初中及一下文化程度" value="父母一方为初中及一下文化程度" />
@@ -179,9 +179,10 @@
 
       <el-form-item label="附件：">
         <el-input v-model="applyForm.fujianName" placeholder="请上传附件" >
-          <el-button slot="append" icon="el-icon-download" @click.native="download"></el-button>
+           <el-button slot="append" icon="el-icon-download" @click.native="download" size="mini" v-if="fileList!=[]"></el-button>
         </el-input>
-        <el-tooltip
+
+           <el-tooltip
           class="item"
           effect="dark"
           content="请把所有需要上传的附件文件压缩后上传，命名为：姓名-学院-专业-班级-学号"
@@ -598,6 +599,8 @@ export default {
               type: "success",
             });
             this.applyForm.fujianName = ''
+            this.fileList=[]
+            console.log("文件的列表",fileList)
           } 
       })
     },
@@ -616,10 +619,10 @@ export default {
     },
     // 下载文件
     download(){
-      const wenjian = JSON.parse(localStorage.getItem("wenjian"));
+      // const wenjian = JSON.parse(localStorage.getItem("wenjian"));
       let data ={
-        url:wenjian.path,
-        filename:wenjian.name
+        url:this.applyForm.fujian,
+        filename:this.applyForm.fujianName
       }
       downloadFile(data).then((res)=>{
         console.log("下载")

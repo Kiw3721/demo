@@ -50,7 +50,7 @@
         icon="el-icon-refresh"
         @click="handlerefresh"
       >
-        重置
+        刷新
       </el-button>
 
     </div>
@@ -139,7 +139,7 @@
         </template>
       </el-table-column>
 
-       <el-table-column
+       <!-- <el-table-column
         label="模块审核"
         align="center"
         width="250"
@@ -154,7 +154,7 @@
             贫困申请
           </el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
       <el-table-column
         label="操作"
