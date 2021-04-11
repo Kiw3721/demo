@@ -3,7 +3,7 @@
     <div class="filter-container">
         <el-date-picker
       v-model="listQuery.time"
-      value-format="yyyy-MM-dd"
+      value-format="yyyy-MM-dd "
       type="date"
       placeholder="选择日期"
        class="filter-item">
@@ -88,10 +88,8 @@
         </template>
       </el-table-column>
 
-       <el-table-column label="填报时间" prop="time" width="200px" align="center" :formatter="formatDate">
-        <template slot-scope="{row}">
-            <span>{{ row.time }}</span>
-        </template>
+       <el-table-column label="填报时间" prop="time" width="200px" align="center" >
+           <template slot-scope="scope">{{scope.row.time| dateYMDHMSFormat}}</template>
       </el-table-column>
 
 
@@ -168,6 +166,20 @@ export default {
       healthList(data).then((res)=>{
         console.log("分页的数据"+res.data);
           this.healthList = res.data
+          for(var i=0;i<this.healthList.length;i++){
+            // console.log("类型是？"+this.healthList[i].region+"-----"+typeof JSON.parse(this.healthList[i].region))
+            if(typeof JSON.parse(this.healthList[i].region) === "object"){
+              var region = JSON.parse(this.healthList[i].region)
+              var loc = "";
+              for (let i = 0; i < region.length; i++) {
+                loc += CodeToText[region[i]];
+              }
+              this.healthList[i].region = loc
+              // console.log("地址是"+loc,this.healthList[i].region )
+            }
+            
+            // console.log("时间是："+this.healthList[i].time)
+          }
           this.listLoading = false
       }).catch(error=>{
           console.log(error);
@@ -190,7 +202,6 @@ export default {
                 console.log("chandu"+this.allData.length)
                 this.totalPage = Math.ceil(this.allData.length / this.pageCount) * 10;
                 console.log("获取总页数"+this.totalPage);
-                this.handleChange()
               }
               this.listLoading = false
           }).catch(error=>{
@@ -214,7 +225,7 @@ export default {
     })
   },
   handlerefresh(){
-    this.listQuery.majorClass=[]
+    this.listQuery.time=[]
     this.listQuery.name=""
     this.listQuery.number=""
     this.getHealthList()
@@ -224,7 +235,7 @@ export default {
     //  for(let i =0;i<this.allData.length;i++){
     //     console.log(this.allData[i].region,"!2321321")
     //  }
-    //  console.log(JSON.parse(this.allData[4].region),"aaaaa")
+     console.log(JSON.parse(this.allData[4].region),"aaaaa")
      var region = JSON.parse(this.allData[4].region)
      console.log(region,"aaaaa")
       var loc = "";
@@ -233,15 +244,6 @@ export default {
       }
       console.log(loc)
     },
-    formatDate(row, column) {
-          // 获取单元格数据
-          let data = row[column.property]
-          if(data == null) {
-              return null
-          }
-          let dt = new Date(data)
-          return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds()
-        },
   }
 };
 </script>

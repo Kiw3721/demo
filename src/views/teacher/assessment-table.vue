@@ -169,11 +169,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="等级" width="200px" align="center">
+      <el-table-column label="等级" width="200px" align="center" icon="el-icon-refresh">
         <template slot-scope="{row}">
           <el-button type="text" size="mini">
 
-           {{row.dengji?row.dengji:dengji}}
+           {{row.dengji?row.dengji:"无"}}
 
           </el-button>
           <el-button icon="el-icon-edit" size="mini" round @click.native="updateLevel(row)"></el-button>
@@ -187,9 +187,9 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
-          <el-button type="primary" size="mini" v-if="row.state==null" @click.native="state(row)"> 未审核 </el-button>
-          <el-button type="primary" size="mini" v-if="row.state==1" @click.native="state(row)"> 通过审核 </el-button> 
-          <el-button type="primary" size="mini" v-if="row.state==2" @click.native="state(row)"> 拒绝通过 </el-button> 
+          <el-button type="primary" size="mini" v-if="row.state=='0'||row.state==null" @click.native="state(row)"> 未审核 </el-button>
+          <el-button type="success" size="mini" v-if="row.state=='1'" @click.native="state(row)"> 通过审核 </el-button> 
+          <el-button type="info" size="mini" v-if="row.state=='2'" @click.native="state(row)"> 拒绝通过 </el-button> 
        </template>
       </el-table-column>
     </el-table>
@@ -218,11 +218,14 @@
       </el-table>
     </el-dialog>
 
-<!-- 审核表单 -->
+<!-- 综合测评审核表单 -->
     <el-dialog title="审核信息" :visible.sync="dialogFormVisible">
   <el-form >
     <el-form-item label="学生姓名" label-width="200px">
       {{ studentlist.s_name}}
+    </el-form-item>
+    <el-form-item label="获奖情况" label-width="200px">
+      {{ studentlist.dengji?studentlist.dengji:"无"}}
     </el-form-item>
     <el-form-item label="备注" label-width="200px">
       <el-input v-model="beizhu" ></el-input>
@@ -233,6 +236,29 @@
     <el-button @click="dialogFormVisible = false">取 消</el-button>
     <el-button type="primary" @click="stateok(1)">通过</el-button>
         <el-button type="primary" @click="stateok(2)">拒绝</el-button>
+  </div>
+</el-dialog>
+
+
+<!-- 等级改变表单 -->
+    <el-dialog title="审核信息" :visible.sync="dialogDengJiFormVisible">
+  <el-form >
+    <el-form-item label="学生姓名" label-width="150px">
+      {{ studentlist.s_name}}
+    </el-form-item>
+     <el-form-item label="获奖情况" label-width="150px">
+        <el-select placeholder="请选择" v-model="dengji">
+          <el-option label="一等奖" value="一等奖" />
+          <el-option label="二等奖" value="二等奖" />
+          <el-option label="三等奖" value="三等奖" />
+          <el-option label="无" value="无" />
+        </el-select>
+      </el-form-item>
+  
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogDengJiFormVisible = false">取 消</el-button>
+    <el-button type="primary" @click="levelChange">确定</el-button>
   </div>
 </el-dialog>
 
@@ -291,7 +317,6 @@ export default {
       beizhu:null,//审批备注
       beizhu1:null, //奖扣分备注
       ComprehensiveList: [],
-      dengji:"无",
       options: [
         {
           value: "信息科学与技术学院",
@@ -412,9 +437,9 @@ export default {
       ],
       // collageOptions: ["信科院", "管院", "艺设"],
       // classOptions: ["计算机171", "信管171", "物联网182"],
-      dialogTableVisible: false,
-      dialogTableVisible1:false,
-      previewVisiblePic:false,
+      dialogTableVisible: false,  //学生自评表
+      dialogTableVisible1:false,   //奖扣分细则弹窗
+      previewVisiblePic:false,   //图片预览弹窗
        //图片地址
       previewPath: "",
       tableData: [
@@ -577,7 +602,9 @@ export default {
       allData:[],//全部数据
       totalPage:1,//总页码
       studentlist:{},//学生详情
-      dialogFormVisible:false,
+      dialogFormVisible:false,   //综合测评审核表单
+      dialogDengJiFormVisible:false,    //等级修改
+      dengji:'',  //等级
       tableData1:[], //奖扣分细则
       studentId:''
     };
@@ -844,7 +871,34 @@ export default {
   },
   // 修改等级
   updateLevel(v){
-    this.dialogFormVisible=true
+    this.studentlist=v
+    this.dialogDengJiFormVisible=true
+  },
+  levelChange(){
+     let data ={
+      studentId:this.studentlist.s_id,
+      dengji:this.dengji,
+    }
+    updateComprehensive(data).then((res)=>{
+        var code = res.statusCode
+        var msg = res.msg
+        if( code == 200) {
+         this.$message({
+            message: msg,
+            type: "success"
+          });
+          this.dialogFormVisible=false
+          // this.getComprehensiveList()
+          // this.getPageTotal()
+          this.reload()
+          }else {
+            this.$message({
+            message: msg,
+            type: "error"
+          });
+            console.log("修改失败！"+msg);
+          }
+      })
   }
   },
   

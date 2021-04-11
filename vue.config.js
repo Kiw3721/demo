@@ -59,12 +59,15 @@ module.exports = {
     name: name,
     resolve: {
       alias: {
-        '@': resolve('src')
+        '@': resolve('src'),
+        'jquery': "jquery/src/jquery" 
       }
     },
     plugins: [
+      // new webpack.optimize.CommonsChunkPlugin('common.js'),
       new webpack.ProvidePlugin({
         $: 'jquery',
+        jquery: 'jquery',
         jQuery: 'jquery',
         'window.jQuery': 'jquery',
         Popper: ['popper.js', 'default']

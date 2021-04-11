@@ -81,7 +81,6 @@
       <el-form-item>
         <el-button type="primary" @click="submitForm" v-show="show">提交</el-button>
         <el-button type="primary" @click="updateForm">修改</el-button>
-        <el-button @click="resetForm('StudentForm')">重置</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -116,11 +115,22 @@ export default {
     var checkNumber = (rule, value, callback) => {
       let regEn = /^[1-9]\d*$/
       if (!regEn.test(value)) {
-        callback(new Error('正整数'))
-      } else {
+        callback(new Error('请输入正整数'))
+      } else if (value.length < 12) {
+        callback(new Error('输入12位的学号'))
+      }else {
         callback()
       }
+      
     };
+    var checkName = (rule,value,callback)=>{
+      let reg =/^[\u4e00-\u9fa5]{2,3}$/
+      if(!reg.test(value)){
+        callback(new Error('请输入汉字'))
+      }else{
+        callback()
+      }
+    }
 
     return {
       StudentForm: {
@@ -135,11 +145,13 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: "请输入姓名", trigger: "blur" },
-          { min: 2, max: 5, message: "长度在 2 到 5 个字符", trigger: "blur" }
+          { required: true, validator: checkName,trigger: "blur" },
+          {min:2,max:5,message:"输入长度为2到5的汉字",trigger:"blur"}
         ],
-        number: [{ required: true, validator: checkNumber, trigger: "blur" }],
-        age: [{ required: true, validator: checkNumber, trigger: "blur" }],
+        number: [
+          { required: true, validator: checkNumber, trigger: "blur" }
+          ],
+        age: [{ required: true, message: "请输入年龄", trigger: "blur" }],
         gender: [{ required: true, message: "请选择性别", trigger: "change" }],
         majorClass: [
           { required: true, message: "请选择学院专业班级", trigger: "change" }
@@ -401,9 +413,6 @@ export default {
             return false;
           }
       })
-    },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
     },
     handleChange(value) {
       console.log(value,'dfsd');

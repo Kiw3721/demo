@@ -157,9 +157,16 @@
       width="30%"
       :modal-append-to-body="false"
     >
-      <span>审核状态：{{this.myData[0].state==null?"未审核":this.myData[0].state==1?"审核通过":"审核未通过"}}</span>
+      <span>
+        审核状态：
+        {{this.myData.length==0?state:this.myData[0].state==null?state:this.myData[0].state==1?"审核通过":"审核未通过"}}
+        <!-- {{this.myData[0].state==null?state:this.myData[0].state==1?"审核通过":"审核未通过"}} -->
+        </span>
       <br>
-      <span>反馈信息：{{this.myData[0].beizhu}}</span>
+      <span>反馈信息：
+        {{this.myData.length==0?beizhu:this.myData[0].beizhu==null?beizhu:this.myData[0].beizhu}}
+        <!-- {{this.myData[0].beizhu==null?beizhu:this.myData[0].beizhu}} -->
+        </span>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
       </span>
@@ -196,6 +203,8 @@ export default {
           label: '文体分'
         }],
       title:"审核结果",
+      state:"未审核",
+      beizhu:"无",
       dialogVisible:false,
     };
   },
@@ -208,14 +217,34 @@ export default {
     updateProof(){
       const studentId = JSON.parse(localStorage.getItem("userInfo")).s_id;
         let data = {
-          activityName: this.activityName,
-          activityNum: this.activityNum,
-          activityProofPic: this.activityProofName,
-          activityType: this.activityType,
           studentId: studentId,
         };
       searchProof(data).then((res)=>{
-        this.myData = res.data
+        var code = res.statusCode;
+        var msg = res.msg;
+        var data = res.data;
+        console.log("pandaun",data,data==true)
+        if(data){
+          if (code == 200) {
+            this.$message({
+              message: msg,
+              type: "success",
+            });
+          } 
+        this.myData = data
+        }else{
+          if (code == 200) {
+            this.$message({
+              message: msg,
+              type: "success",
+            });
+          }else{
+            this.$message({
+              message: msg,
+              type: "error",
+            });
+          }
+        }
         })
     },
     // 上传设置
@@ -225,27 +254,30 @@ export default {
       console.log("file的类型:"+testFile)
       const isIMAGE = testFile === 'jpg' || testFile === 'png';
       console.log("file的类型:"+isIMAGE)
-      const isLt1M = file.size / 1024 / 1024 < 1;
+      // const isLt1M = file.size / 1024 / 1024 < 1;
 
       if (!isIMAGE) {
         this.$message.warning('上传文件只能是图片格式!');
         this.fileList = []
         return false;
       }
-      if (!isLt1M) {
-        this.$message.warning('上传文件大小不能超过 1MB!');
-        this.fileList = []
-        return false;
-      }
-      return isIMAGE && isLt1M;
+      // if (!isLt1M) {
+      //   this.$message.warning('上传文件大小不能超过 1MB!');
+      //   this.fileList = []
+      //   return false;
+      // }
+      // return isIMAGE && isLt1M;
+      return isIMAGE;
     },
     handleExceed(files, fileList) {
       this.$message.warning(`只能选择一张图片证明`);
     },
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
     handleRemove(file, fileList) {
-      this.activityProofName = "";
+      console.log("数组1111"+this.fileList)
       this.deleteFile(file.pic)
-      console.log("11111111", file, fileList);
     },
     // 删除图片接口
     deleteFile(proofPath){
@@ -262,6 +294,9 @@ export default {
               type: "success",
             });
           } 
+          this.activityProofName = "";
+          this.fileList.pop()
+          console.log("数组222"+this.fileList)
       })
     },
     //触发图片预览
@@ -272,9 +307,7 @@ export default {
       console.log("1231221" + this.previewPath);
       this.previewVisible = true;
     },
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
-    },
+    
     //监听图片上传成功
     handleSuccess(response) {
       //拼接得到图片信息对象
@@ -332,6 +365,7 @@ export default {
           activityName: this.activityName,
           activityNum: this.activityNum,
           activityProofPic: this.activityProofName,
+          activityProofPath:proofPic
         });
 
         this.activityName = "";

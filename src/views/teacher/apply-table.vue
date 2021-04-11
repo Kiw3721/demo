@@ -126,8 +126,8 @@
       >
         <template slot-scope="{ row }">
           <el-button type="primary" size="mini" v-if="row.state==null"> 未审核 </el-button>
-          <el-button type="primary" size="mini" v-if="row.state==1"> 通过审核 </el-button> 
-          <el-button type="primary" size="mini" v-if="row.state==2"> 拒绝通过 </el-button> 
+          <el-button type="success" size="mini" v-if="row.state==1"> 通过审核 </el-button> 
+          <el-button type="info" size="mini" v-if="row.state==2"> 拒绝通过 </el-button> 
        </template>
       </el-table-column>
 
@@ -144,128 +144,128 @@
 
 
 <!-- 贫困申请的表单 -->
- <el-dialog title="审核信息" :visible.sync="dialogFormVisible">
-  <el-form label-width="200px" :inline="true">
+ <el-dialog title="审核信息" :visible.sync="dialogFormVisible" width="700px">
+  <el-form label-width="220px" >
 
     <el-form-item label="学院-专业-班级：">
-       {{ JSON.stringify(applyList.majorClass)}}
+       {{ poorApply.majorClass}}
       </el-form-item>
 
     <el-form-item label="姓名">
-      {{ applyList.name}}
+      {{ poorApply.name}}
     </el-form-item>
 
     <el-form-item label="学号：">
-       {{ applyList.number}}
+       {{ poorApply.number}}
       </el-form-item>
 
       <el-form-item label="性别：" prop="gender">
-        {{ applyList.gender}}
+        {{ poorApply.gender}}
       </el-form-item>
 
       <el-form-item label="身份证号：">
-        {{applyList.idCard}}
+        {{poorApply.idCard}}
       </el-form-item>
 
       <el-form-item label="家庭住址：">
-        {{applyList.region}}
+        {{poorApply.region}}
       </el-form-item>
 
       <el-form-item label="联系电话：">
-         {{applyList.telephone}}
+         {{poorApply.telephone}}
       </el-form-item>
 
       <el-form-item label="学生本人是否患重大疾病：">
-        {{applyList.sick}}
+        {{poorApply.sick}}
       </el-form-item>
 
       <el-form-item label="是否特困供养员：">
-        {{applyList.difficultPerson}}
+        {{poorApply.difficultPerson}}
       </el-form-item>
 
       <el-form-item label="是否城镇低收入困难家庭：" >
-        {{applyList.difficultFamily}}
+        {{poorApply.difficultFamily}}
       </el-form-item>
 
       <el-form-item label="是否城乡低收入保障户：" >
-        {{applyList.security}}
+        {{poorApply.security}}
       </el-form-item>
 
       <el-form-item label="是否建档立卡家庭：">
-        {{applyList.modelCard}}
+        {{poorApply.modelCard}}
       </el-form-item>
 
 
       <el-form-item label="是否特困职工子女：">
-        {{applyList.difficultChild}}
+        {{poorApply.difficultChild}}
       </el-form-item>
 
       <el-form-item label="是否孤儿：">
-        {{applyList.orphan}}
+        {{poorApply.orphan}}
       </el-form-item>
 
       <el-form-item label="是否优抚对象：" >
-        {{applyList.entitledGroup}}
+        {{poorApply.entitledGroup}}
       </el-form-item>
 
       <el-form-item label="父母不能履行抚养义务的儿童：">
-        {{applyList.foster}}
+        {{poorApply.foster}}
       </el-form-item>
 
       <el-form-item label="是否因公牺牲警察子女：">
-        {{applyList.policeChild}}
+        {{poorApply.policeChild}}
       </el-form-item>
 
       <el-form-item label="学生本人是否残疾：">
-        {{applyList.disability}}
+        {{poorApply.disability}}
       </el-form-item>
 
       <el-form-item label="是否父母一方抚养：" >
-        {{applyList.fosterOne}}
+        {{poorApply.fosterOne}}
       </el-form-item>
 
       <el-form-item label="赡养人口数：">
-        {{applyList.support}}
+        {{poorApply.support}}
       </el-form-item>
 
       <el-form-item label="赡养老人：">
-        {{applyList.supportOld}}
+        {{poorApply.supportOld}}
       </el-form-item>
 
       <el-form-item label="家庭成员失业人数：">
-        {{applyList.noWork}}
+        {{poorApply.noWork}}
       </el-form-item>
 
       <el-form-item label="父母从业情况：">
-        {{applyList.parentWork}}
+        {{poorApply.parentWork}}
       </el-form-item>
 
       <el-form-item label="父母从业情况：">
-        {{applyList.culture}}
+        {{poorApply.culture}}
       </el-form-item>
 
       <el-form-item label="父母年龄：" >
-        {{applyList.parentAge}}
+        {{poorApply.parentAge}}
       </el-form-item>
 
       <el-form-item label="劳动力人口数：" >
-        {{applyList.workPerson}}
+        {{poorApply.workPerson}}
       </el-form-item>
 
       <el-form-item label="家庭人口数：">
-        {{applyList.familyPerson}}
+        {{poorApply.familyPerson}}
       </el-form-item>
 
       <el-form-item label="家庭在读人数：">
-        {{applyList.studyPerson}}
+        {{poorApply.studyPerson}}
       </el-form-item>
 
       <el-form-item label="家庭人均年收入：" >
-        {{applyList.yearInput}}
+        {{poorApply.yearInput}}
       </el-form-item>
 
        <el-form-item label="附件：">
-         <a href="javascript:">{{applyList.fujianName}}</a>
+         <a href="javascript:">{{poorApply.fujianName}}</a>
          <el-button icon="el-icon-download" @click.native="download"> </el-button>
       </el-form-item>
 
@@ -295,6 +295,7 @@ export default {
     return {
       listLoading: true,
       applyList: [],
+      poorApply:[],
       listQuery: {
         majorClass:[],
         name: "",
@@ -448,8 +449,8 @@ export default {
             // 将字符串转为数组
           val.majorClass=JSON.parse(val.majorClass)
           }
+          
         })
- 
           this.applyList = res.data
           this.listLoading = false
       }).catch(error=>{
@@ -507,13 +508,20 @@ export default {
   },
   // 审核
     handleWatch(v){
-    this.applyList=v
+    this.poorApply=v
+    console.log("班级",this.poorApply.majorClass,typeof this.poorApply.majorClass)
+    var major = ""
+    for(var i=0;i<this.poorApply.majorClass.length;i++){
+       major += this.poorApply.majorClass[i]
+    }
+    console.log("简写班级",major)
+    this.poorApply.majorClass = major
     this.dialogFormVisible=true
   },
     // 贫困申请的状态
   stateok(sum){
       let data ={
-      studentId:this.applyList.studentId,
+      studentId:this.poorApply.studentId,
       state:sum,
       beizhu:this.beizhu,
     }

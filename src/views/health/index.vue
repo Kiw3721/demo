@@ -74,10 +74,10 @@
           size="large"
           :options="options"
           v-model="healthForm.region"
-          @change="handleChange"
         >
         </el-cascader>
       </el-form-item>
+      <!-- @change="handleChange" -->
 
       <el-form-item style="padding:0 300px">
         <el-button
@@ -172,7 +172,6 @@ export default {
     if(hasUserInfo === "undefined"){
       console.log("未填写学生信息")
     }else{
-      this.show=false
       const student = JSON.parse(localStorage.getItem('userInfo'))
       this.healthForm.name=student.s_name,
       this.healthForm.number=student.s_number,
@@ -183,8 +182,6 @@ export default {
   },
   methods: {
     submitForm() {
-      console.log("111111"+this.healthForm.time)
-      console.log("111111"+this.healthForm.region)
       const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
       console.log("12345"+studentId);
       let data={
@@ -196,7 +193,8 @@ export default {
         time:this.healthForm.time,
         temperature:this.healthForm.temperature,
         ill: this.healthForm.ill,
-        region: this.local
+        // region: this.local
+        region:JSON.stringify(this.healthForm.region)
       }
       addHealth(data).then((res)=>{
         var code = res.statusCode
@@ -229,7 +227,8 @@ export default {
         time:this.healthForm.time,
         temperature:this.healthForm.temperature,
         ill: this.healthForm.ill,
-        region: JSON.stringify(this.healthForm.region)
+        // region:  this.local
+         region:JSON.stringify(this.healthForm.region)
       }
       console.log("12321321",this.healthForm.time)
       updateHealth(data).then((res)=>{
@@ -251,9 +250,7 @@ export default {
           }
       })
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-    },
+    // 码转文
     handleChange() {
       var loc = "";
       for (let i = 0; i < this.healthForm.region.length; i++) {
@@ -270,15 +267,15 @@ export default {
       selectHealthById(data).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
-        if(code == 200){
+        var data =res.list
+        if(data){
+          if(code == 200){
           this.$message({
             message: msg,
             type: "success"
           });
           this.healthForm = res.list
           this.healthForm.region = JSON.parse(res.list.region)
-          console.log("123456",res.list.region,"111111",res.list.time)
-          // console.log(TextToCode["河北省"]["秦皇岛市"]["海港区"])
           this.show=false
         }else{
            this.$message({
@@ -287,6 +284,12 @@ export default {
           });
             console.log("获取失败！"+msg);
             return false;
+        }
+        }else{
+          this.$message({
+            message: "请输入健康登记信息",
+            type: "success"
+          });
         }
       })
     },

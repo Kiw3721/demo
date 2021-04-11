@@ -2,18 +2,22 @@ import Vue from 'vue'
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
+
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import locale from 'element-ui/lib/locale/lang/zh-CN' // lang i18n
 
 import '@/styles/index.scss' // global css
-import './bootstrap/bootstrap'
+// import './bootstrap/bootstrap'
 import './bootstrap/bootstrap.min.css'
 
 import App from './App'
 import store from './store'
 import router from './router'
-import $ from 'jquery'
+import moment from 'moment'
+// import $ from 'jquery'
+
+
 
 import '@/icons' // icon
 import '@/permission' // permission control
@@ -36,6 +40,12 @@ import '@/permission' // permission control
 Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 Vue.use(ElementUI)
+Vue.use(require('vue-moment'));
+Vue.prototype.moment = moment
+
+Vue.filter('dateYMDHMSFormat',function(dateStr,pattern='YYYY-MM-DD HH:mm:ss'){
+  return moment(dateStr).format(pattern);
+})
 
 Vue.config.productionTip = false
 
@@ -43,7 +53,7 @@ new Vue({
   el: '#app',
   router,
   store,
-  $,
+  // $,
   render: h => h(App)
 })
 

@@ -284,11 +284,76 @@
 import { submitComprehensive ,updateComprehensive,selectComprehensiveById} from "@/api/comprehensive";
 import { parse } from 'path-to-regexp';
 
-
 export default {
   props: [],
   inject:['reload'],
   data() {
+    const validateNum1 = (rule, value, callback) => {
+  if (!value) {
+        return callback(new Error("请输入分数"));
+      } else if (value > 15){
+        callback(new Error('最大值为15'))
+      }else{
+        callback();
+      }
+    };
+
+const validateNum2 = (rule, value, callback) => {
+  if (!value) {
+        return callback(new Error("请输入分数"));
+      } else if (value > 13){
+        callback(new Error('最大值为13'))
+      }else{
+        callback();
+      }
+    };
+
+const validateNum3 = (rule, value, callback) => {
+  if (!value) {
+        return callback(new Error("请输入分数"));
+      } else if (value > 14){
+        callback(new Error('最大值为14'))
+      }else{
+        callback();
+      }
+    };
+
+    const validateNum4 = (rule, value, callback) => {
+  if (!value) {
+        return callback(new Error("请输入分数"));
+      } else if (value > 10){
+        callback(new Error('最大值为10'))
+      }else{
+        callback();
+      }
+    };
+      const validateNum5 = (rule, value, callback) => {
+  if (!value) {
+        return callback(new Error("请输入分数"));
+      } else if (value > 90){
+        callback(new Error('学习成绩最高为90分'))
+      }else{
+        callback();
+      }
+    };
+     const validateNum6 = (rule, value, callback) => {
+  if (!value) {
+        return callback(new Error("请输入分数"));
+      } else if (value > 60){
+        callback(new Error('体育课分数最高为60分'))
+      }else{
+        callback();
+      }
+    };
+        const validateNum7 = (rule, value, callback) => {
+  if (!value) {
+        return callback(new Error("请输入分数"));
+      } else if (value > 30){
+        callback(new Error('最大值为30'))
+      }else{
+        callback();
+      }
+    };
     return {
       formData: {
         beizhu:'',
@@ -321,49 +386,49 @@ export default {
         sxzzgn: [
           {
             required: true,
-            message: "请输入分数",
+            validator: validateNum1,
             trigger: "blur",
           },
         ],
         jlgn: [
           {
             required: true,
-            message: "请输入分数",
+            validator: validateNum3,
             trigger: "blur",
           },
         ],
         jcwmxy: [
           {
             required: true,
-            message: "请输入分数",
+            validator: validateNum2,
             trigger: "blur",
           },
         ],
         jtgn: [
           {
             required: true,
-            message: "请输入分数",
+            validator: validateNum2,
             trigger: "blur",
           },
         ],
         xsgybx: [
           {
             required: true,
-            message: "请输入分数",
+            validator: validateNum1,
             trigger: "blur",
           },
         ],
         shsj: [
           {
             required: true,
-            message: "请输入分数",
+            validator: validateNum1,
             trigger: "blur",
           },
         ],
         sixiangfenjf: [
           {
             required: true,
-            message: "请输入分数",
+            validator: validateNum1,
             trigger: "blur",
           },
         ],
@@ -391,14 +456,14 @@ export default {
         xxcj: [
           {
             required: true,
-            message: "请输入分数",
+            validator:validateNum5,
             trigger: "blur",
           },
         ],
         xueyefenjf: [
           {
             required: true,
-            message: "请输入分数",
+            validator:validateNum4,
             trigger: "blur",
           },
         ],
@@ -426,21 +491,21 @@ export default {
         tiyuke: [
           {
             required: true,
-            message: "请输入分数",
+            validator:validateNum6,
             trigger: "blur",
           },
         ],
         wthd: [
           {
             required: true,
-            message: "请输入分数",
+            validator:validateNum4,
             trigger: "blur",
           },
         ],
         wentifenjf: [
           {
             required: true,
-            message: "请输入分数",
+            validator:validateNum7,
             trigger: "blur",
           },
         ],
@@ -470,10 +535,6 @@ export default {
     };
   },
   computed: {
-    sixiangfenxj(){
-      console.log("小计")
-      this.formData.sixiangfenxj = parseInt(this.formData.sxzzgn+this.formData.jlgn)
-    }
   },
   watch: {},
   created() {

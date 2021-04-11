@@ -493,7 +493,7 @@ export default {
       this.applyForm["studentId"]=studentId
       this.applyForm.fujian=wenjian.path
       this.applyForm.fujianName=wenjian.name
-      // this.applyForm["majorClass"]=this.applyForm.majorClass,
+      this.applyForm["majorClass"]=JSON.stringify(this.applyForm.majorClass),
       console.log("biadao111111",this.applyForm)
     addApply(this.applyForm).then((res)=>{
         var code = res.statusCode
@@ -547,12 +547,15 @@ export default {
       searchApplyById(data).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
-        if( code == 200) { 
+        var data = res.data
+        if(data){
+          if( code == 200) { 
            this.$message({
             message: msg,
             type: "success"
           });
           this.show = false
+          // 判断返回的数据是否为空
           this.applyForm = res.data
           this.applyForm.majorClass = JSON.parse(res.data.majorClass)
           // this.applyForm.fujianName = res.data.fujianName
@@ -564,6 +567,12 @@ export default {
             console.log("获取失败！"+msg);
             return false;
           }
+        }else{
+          this.$message({
+            message: "请输入贫困申请信息",
+            type: "success"
+          });
+        }
       })
     },
     handleChange(value) {
