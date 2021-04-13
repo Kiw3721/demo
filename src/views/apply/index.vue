@@ -489,11 +489,13 @@ export default {
     submitForm() {
       const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
       const wenjian = JSON.parse(localStorage.getItem("wenjian"));
+      if(wenjian !== null){
+        this.applyForm.fujian=wenjian.path
+        this.applyForm.fujianName=wenjian.name
+      }
+      this.applyForm["majorClass"]=JSON.stringify(this.applyForm.majorClass),
       console.log("biadao=fcas",this.applyForm,studentId)
       this.applyForm["studentId"]=studentId
-      this.applyForm.fujian=wenjian.path
-      this.applyForm.fujianName=wenjian.name
-      this.applyForm["majorClass"]=JSON.stringify(this.applyForm.majorClass),
       console.log("biadao111111",this.applyForm)
     addApply(this.applyForm).then((res)=>{
         var code = res.statusCode

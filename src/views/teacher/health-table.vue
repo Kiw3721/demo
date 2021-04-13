@@ -41,6 +41,16 @@
         重置
       </el-button>
 
+       <el-button
+        :loading="downloadLoading"
+        class="filter-item"
+        type="primary"
+        icon="el-icon-download"
+        @click.native="handleDownload"
+      >
+        导出
+      </el-button>
+
     </div>
 
     <el-table
@@ -50,11 +60,15 @@
       fit
       highlight-current-row
       style="width: 100%;"
+      @selection-change="handleSelectionChange"
     >
+
+
+    <el-table-column type="selection" align="center" />
+
       <el-table-column
         label="ID"
         prop="studentId"
-        sortable="custom"
         align="center"
         width="80"
       >
@@ -129,6 +143,7 @@
 <script>
 import { healthList } from '@/api/health'
 import { CodeToText} from "element-china-area-data";
+const { export_json_to_excel } = require('@/vendor/Export2Excel');
 
 export default {
   name: "health",
@@ -146,7 +161,9 @@ export default {
       pageCount:10,//数据数
       currentNo:1,//当前页码
       allData:[],//全部数据
-      totalPage:1//总页码
+      totalPage:1,//总页码
+      downloadLoading:false,
+      multipleSelection: [],
     };
   },
   created() {
@@ -244,6 +261,49 @@ export default {
       }
       console.log(loc)
     },
+     //选择
+  handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+  // 导出
+  //导出的方法
+  handleDownload() {
+    require.ensure([], () => {
+      // 设置Excel的表格第一行的标题
+      const tHeader = [
+            "学号",
+            "姓名",
+            "性别",
+            "手机号码",
+            "身份证",
+            "填报时间",
+            "温度",
+            "是否有咳嗽、呼吸困难等症状",
+            "所在区域"
+          ];
+       const filterVal = [
+            "number",
+            "name",
+            "gender",
+            "telephone",
+            "time",
+            "temperature",
+            "ill",
+            "region"
+          ];
+      
+      // 数据集
+      const list = this.multipleSelection; 
+      const data = this.formatJson(filterVal, list);
+      // excel名称可自定义
+      const excelName = "学生健康信息表";
+      export_json_to_excel(tHeader, data, excelName);
+    });
+  },
+  //格式化json
+  formatJson(filterVal, jsonData) {
+    return jsonData.map(v => filterVal.map(j => v[j]))
+  },
   }
 };
 </script>

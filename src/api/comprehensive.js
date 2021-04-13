@@ -45,3 +45,12 @@ export function selectComprehensiveById(params) {
       params
     })
   }
+
+  //修改等级
+export function updateLevel(data) {
+  return request({
+    url: '/updateLevel',
+    method: 'post',
+    data
+  })
+}

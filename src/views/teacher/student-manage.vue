@@ -34,7 +34,6 @@
       <!-- @click="handleFilter" -->
 <!-- 
       <el-button
-        v-waves
         :loading="downloadLoading"
         class="filter-item"
         type="primary"
@@ -53,6 +52,16 @@
         刷新
       </el-button>
 
+      <el-button
+        :loading="downloadLoading"
+        class="filter-item"
+        type="primary"
+        icon="el-icon-download"
+        @click.native="handleDownload"
+      >
+        导出
+      </el-button>
+
     </div>
 
     <el-table
@@ -62,11 +71,15 @@
       fit
       highlight-current-row
       style="width: 100%;"
+      @selection-change="handleSelectionChange"
     >
+
+
+    <el-table-column type="selection" align="center" />
+
       <el-table-column
         label="ID"
         prop="s_id"
-        sortable="custom"
         align="center"
         width="80"
       >
@@ -102,7 +115,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="班级" prop="s_grade" width="50px" align="center">
+      <el-table-column label="班级" prop="s_class" width="50px" align="center">
         <template slot-scope="{row}">
             <span>{{row.s_college?row.s_college[2]:'' }}</span>
         </template>
@@ -184,6 +197,9 @@
 
 <script>
 import { getAllStudent ,StudentList,deleteStudent} from '@/api/student'
+//导出excel
+import Blob from '@/vendor/Blob'
+const { export_json_to_excel } = require('@/vendor/Export2Excel');
 
 export default {
   name: "ComplexTable",
@@ -319,7 +335,9 @@ export default {
       pageCount:10,//数据数
       currentNo:1,//当前页码
       allData:[],//全部数据
-      totalPage:1//总页码
+      totalPage:1,//总页码
+      multipleSelection: [],
+      downloadLoading:false
     };
   },
   created() {
@@ -420,14 +438,57 @@ export default {
           console.log(error);
     })
   },
+  // 刷新
   handlerefresh(){
     this.listQuery.majorClass=[]
     this.listQuery.name=""
     this.listQuery.number=""
     this.StudentList()
     this.getPageTotal();
-  }
-
+  },
+  //选择
+  handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+  // 导出
+  //导出的方法
+  handleDownload() {
+    require.ensure([], () => {
+      // 设置Excel的表格第一行的标题
+      const tHeader = [
+            "学号",
+            "姓名",
+            "学院专业班级",
+            "年龄",
+            "性别",
+            "手机号码",
+            "身份证",
+            "家庭住址"
+          ];
+       const filterVal = [
+            "s_number",
+            "s_name",
+            "s_college",
+            "s_age",
+            "s_gender",
+            "s_telephone",
+            "s_idCard",
+            "s_address"
+          ];
+      
+      // 数据集
+      const list = this.multipleSelection; 
+      const data = this.formatJson(filterVal, list);
+      // excel名称可自定义
+      const excelName = "学生信息表";
+      export_json_to_excel(tHeader, data, excelName);
+    });
+  },
+  //格式化json
+  formatJson(filterVal, jsonData) {
+    return jsonData.map(v => filterVal.map(j => v[j]))
+  },
+    
   }
 };
 </script>

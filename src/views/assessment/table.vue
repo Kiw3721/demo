@@ -254,8 +254,8 @@
         </div>
         <el-col :span="24">
           <el-form-item size="large" style="text-align: center">
-            <el-button type="primary" @click="submitForm" v-show="show">提交</el-button>
-            <el-button type="primary" @click="updateForm">修改</el-button>
+            <el-button type="primary" @click="submitForm('elForm')" v-show="show">提交</el-button>
+            <el-button type="primary" @click="updateForm('elForm')">修改</el-button>
             <el-badge value="new" class="item">
                 <el-button @click="dialogVisible = true">审核状态</el-button>
             </el-badge>
@@ -542,7 +542,7 @@ const validateNum3 = (rule, value, callback) => {
   },
   mounted() {},
   methods: {
-    submitForm() {
+    submitForm(formData) {
       const sId = JSON.parse(localStorage.getItem('userInfo')).s_id
       this.formData["studentId"]=JSON.stringify(sId)
       console.log("000000000",this.formData.studentId)
@@ -572,9 +572,11 @@ const validateNum3 = (rule, value, callback) => {
         wentifenxj:this.formData.wentifenxj,
         wentifen:this.formData.wentifen,
         studentId:sId,
-        zonghefen:Number(this.formData.sixiangfen+this.formData.xueyefen+this.formData.wentifen)
+        zonghefen:Number(this.formData.sixiangfen)+Number(this.formData.xueyefen)+Number(this.formData.wentifen)
       };
-      submitComprehensive(data).then((res)=>{
+      this.$refs[formData].validate(valid => {
+        if (valid) {
+         submitComprehensive(data).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
         if( code == 200) { 
@@ -592,9 +594,18 @@ const validateNum3 = (rule, value, callback) => {
             return false;
           }
       })
+        } else {
+          this.$message({
+            message: "请填写完整的个人信息",
+            type: "error"
+           });
+          return false;
+        }
+      })
+      
       
     },
-    updateForm(){
+    updateForm(formData){
       const studentId = JSON.parse(localStorage.getItem('userInfo')).s_id
       let data = {
         sxzzgn: this.formData.sxzzgn,
@@ -619,9 +630,11 @@ const validateNum3 = (rule, value, callback) => {
         wentifenxj:this.formData.wentifenxj,
         wentifen:this.formData.wentifen,
         studentId:studentId,
-        zonghefen:Number(this.formData.sixiangfen+this.formData.xueyefen+this.formData.wentifen)
+        zonghefen:Number(this.formData.sixiangfen)+Number(this.formData.xueyefen)+Number(this.formData.wentifen)
       };
-      updateComprehensive(data).then((res)=>{
+            this.$refs[formData].validate(valid => {
+        if (valid) {
+           updateComprehensive(data).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
         if( code == 200) {
@@ -638,6 +651,14 @@ const validateNum3 = (rule, value, callback) => {
           });
             console.log("修改失败！"+msg);
           }
+      })
+        } else {
+          this.$message({
+            message: "请填写完整的个人信息",
+            type: "error"
+           });
+          return false;
+        }
       })
     },
     selectComprehensiveById(){

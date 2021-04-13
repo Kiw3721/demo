@@ -12,7 +12,7 @@
       <el-form-item label="姓名：" prop="name">
         <el-input v-model="StudentForm.name" placeholder="请输入姓名" />
       </el-form-item>
-       <el-form-item label="学号：" prop="number">
+      <el-form-item label="学号：" prop="number">
         <el-input
           ref="sno"
           v-model="StudentForm.number"
@@ -30,7 +30,7 @@
       <el-form-item label="年龄：" prop="age">
         <el-input v-model="StudentForm.age" placeholder="请输入年龄" />
       </el-form-item>
-     
+
       <!-- <el-cascader style="width:1.3rem;"
                        :options="options"
                        v-model="addKeyPersonForm.registered"
@@ -66,11 +66,11 @@
         </el-select>
       </el-form-item> -->
 
-       <el-form-item label="联系方式：" prop="phone">
+      <el-form-item label="联系方式：" prop="phone">
         <el-input v-model="StudentForm.phone" placeholder="请输入手机号码" />
       </el-form-item>
 
-       <el-form-item label="身份证：" prop="idCard">
+      <el-form-item label="身份证：" prop="idCard">
         <el-input v-model="StudentForm.idCard" placeholder="请输入身份证" />
       </el-form-item>
 
@@ -79,8 +79,10 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="submitForm" v-show="show">提交</el-button>
-        <el-button type="primary" @click="updateForm">修改</el-button>
+        <el-button type="primary" @click="submitForm('StudentForm')" v-show="show"
+          >提交</el-button
+        >
+        <el-button type="primary" @click="updateForm('StudentForm')">修改</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -294,10 +296,11 @@ export default {
     ...mapGetters(["account"])
   },
   created() {
-    
     // const hasUserInfo = localStorage.getItem('userInfo')?true:false
     const hasUserInfo = localStorage.getItem('userInfo')
     console.log("aaaaaa"+ hasUserInfo);  //string
+    const userInfo = JSON.parse(localStorage.getItem('user'))
+    this.StudentForm.number = userInfo.account
     if(hasUserInfo === "undefined"){
       console.log("未填写个人信息")
     }else{
@@ -306,7 +309,7 @@ export default {
     }
   },
   methods: {
-    submitForm() {
+    submitForm(StudentForm) {
      const userId = JSON.parse(localStorage.getItem('user')).id
      console.log("1111111"+userId)
      let data = {
@@ -320,29 +323,38 @@ export default {
         s_address: this.StudentForm.address,
         userId:userId
       };
-      // console.log("44444444"+data.s_number)
-      addStudent(data).then((res) => {
-        var code = res.statusCode
-        var msg = res.msg
-        if( code == 200) { 
-        // 将后台返回的JSON数据存入浏览器localStorage
-        localStorage.setItem("userInfo", JSON.stringify(res.userInfo));
-         this.$message({
-            message: msg,
-            type: "success"
-          });
-          this.show = false
-          }else {
-            this.$message({
-            message: msg,
-            type: "error"
-          });
+      this.$refs[StudentForm].validate(valid => {
+        if (valid) {
+           addStudent(data).then((res) => {
+            var code = res.statusCode
+            var msg = res.msg
+              if( code == 200) { 
+              // 将后台返回的JSON数据存入浏览器localStorage
+                localStorage.setItem("userInfo", JSON.stringify(res.userInfo));
+                this.$message({
+                  message: msg,
+                  type: "success"
+                });
+                this.show = false
+              }else {
+                this.$message({
+                  message: msg,
+                  type: "error"
+                });
             console.log("录入失败！"+msg);
             return false;
           }
-      });
+      })
+        } else {
+          this.$message({
+            message: "请填写完整的个人信息",
+            type: "error"
+           });
+          return false;
+        }
+      })
     },
-    updateForm(){
+    updateForm(StudentForm){
       const sId = JSON.parse(localStorage.getItem('userInfo')).s_id
       const userId = JSON.parse(localStorage.getItem('userInfo')).userId
       console.log("表单的数据！！！"+JSON.stringify(this.StudentForm));
@@ -358,7 +370,9 @@ export default {
         s_address: this.StudentForm.address,
         userId:userId
       };
-      updateStudent(data).then((res)=>{
+      this.$refs[StudentForm].validate(valid => {
+        if (valid) {
+           updateStudent(data).then((res)=>{
         var code = res.statusCode
         var msg = res.msg
         if( code == 200) {
@@ -376,6 +390,14 @@ export default {
           });
             console.log("修改失败！"+msg);
           }
+      })
+        } else {
+          this.$message({
+            message: "请填写完整的个人信息",
+            type: "error"
+           });
+          return false;
+        }
       })
     },
     getStudentById(){
